@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1672" height="941" viewBox="0 0 1672 941">
+  <rect width="1672" height="941" fill="#12100e"/>
+  <rect x="40" y="40" width="1592" height="861" fill="none" stroke="#2d5a46" stroke-width="3"/>
+  <rect x="56" y="56" width="1560" height="829" fill="none" stroke="#2d5a46" stroke-width="1" opacity="0.5"/>
+  <text x="836" y="330" text-anchor="middle" font-family="Courier New, monospace" font-size="96" letter-spacing="18" fill="#e8e2d5">THE LANTERN ROOM</text>
+  <text x="836" y="400" text-anchor="middle" font-family="Courier New, monospace" font-size="30" letter-spacing="10" fill="#8a8577">MISSION TEMPLATE — EXAMPLE LANDING SCENE</text>
+  <line x1="536" y1="460" x2="1136" y2="460" stroke="#2d5a46" stroke-width="2"/>
+  <text x="836" y="540" text-anchor="middle" font-family="Courier New, monospace" font-size="24" letter-spacing="6" fill="#5f5b51">REPLACE THIS ARTWORK WITH YOUR OWN LANDING PAGE</text>
+  <text x="836" y="590" text-anchor="middle" font-family="Courier New, monospace" font-size="24" letter-spacing="6" fill="#5f5b51">src/assets/examples/example-landing.svg</text>
+  <text x="836" y="800" text-anchor="middle" font-family="Courier New, monospace" font-size="20" letter-spacing="8" fill="#3f3c35">THE VERDANT COVENANT — FIELD OPERATIONS ARCHIVE</text>
+</svg>

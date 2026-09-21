@@ -1,0 +1,73 @@
+# Example Mission — Locations & Factions (Item pack)
+# Items: location, organization
+#
+# location documents are DA-ONLY scene kits: the description, positive/negative
+# outcomes and milestone notes are for running the place at the table, not for
+# showing players. The player-facing version of a location is the room itself.
+---
+
+- _id: example-l1
+  name: 'L1 — The Lantern Room (Mayfair)'
+  type: location
+  system:
+    locationId: L1
+    caseId: EXAMPLE-65-001
+    # availability gates WHEN the location can come into play:
+    #   open | clue | contact | time | packet  (see the system's location sheet)
+    availability: open
+    availabilityCondition: ''
+    # Slug references resolve to UUID arrays at build time. The location sheet
+    # uses them to cross-link the cards and people found here.
+    informationCardSlugs: [example-ic01, example-ic02, example-ic03]
+    npcSlugs: [example-npc-curator]
+    description: >
+      <p><strong>The house.</strong> Three floors of Georgian frontage off
+      Berkeley Square, all green baize and discretion. The auction floor is
+      ground level; the consignment office and ledgers sit behind it; the
+      cellar holds intake that has not been catalogued yet — including,
+      currently, Lot 41's transit crate.</p>
+      <p><strong>Access.</strong> Viewing days are open to registered bidders;
+      registration takes references and a day's wait. Staff pass by the
+      service entrance on the mews, checked by the floor security mob.</p>
+      <p><strong>Dramatis personae.</strong> Desmond Clarke — consignment
+      procurator (see his cast card and actor). Mrs. Halloway — the auctioneer,
+      upstairs, unimpressed by everyone.</p>
+      <p><strong>Tone beat.</strong> Nothing supernatural should be visible
+      here until the cell finds the storeroom: the horror is an ordinary house
+      slowly getting colder.</p>
+    positiveResult: >
+      <p>The cell works the house within its rules: viewing day access, two
+      clue cards recovered (I1, I2), and Clarke isolated for a private
+      conversation that opens the storeroom door.</p>
+    negativeResult: >
+      <p>Pushing the house — picked locks, roused security, a scene — gets the
+      cell removed and Lot 41 pulled from display. Clarke takes the buyer's
+      money that night, and the case moves to the Circle's timetable.</p>
+    milestoneChanges: >
+      <p><strong>O1 M1.</strong> The Circle's proxy registers; the viewing days
+      acquire a second set of interested eyes. <strong>O1 M2.</strong> The
+      consignment office is audited; I1's copy goes into the house lawyer's
+      files. <strong>P1 M2.</strong> Clarke stops taking meetings entirely and
+      the storeroom key leaves the building.</p>
+
+- _id: example-org1
+  name: 'O1 — The Ember Circle'
+  type: organization
+  system:
+    organizationId: O1
+    caseId: EXAMPLE-65-001
+    isActive: true
+    isDormant: false
+    description: >
+      <p><strong>What they are.</strong> A buyers' network of eleven collectors
+      across five countries who purchase occult material for private display.
+      They are not a cult and not an army: they are money with an interest, and
+      the interest is the case's relic.</p>
+      <p><strong>Method.</strong> Register as clients. Outbid the field.
+      Acquire provenance to make the purchase look lawful. Their London agent
+      carries a letter of credit and a listener's patience; he has never been
+      photographed at a scene, because he has never been at one the police
+      would recognise.</p>
+      <p><strong>Pressure.</strong> The Circle escalates through paperwork,
+      not violence — the second track milestone is them buying the house's
+      vetting clerk, which is worse for the cell than any gun.</p>

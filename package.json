@@ -1,0 +1,32 @@
+{
+  "name": "neon-relic-mission-template",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Mission template for Neon Relic — Foundry VTT v14 content module scaffolding with examples of every document type",
+  "license": "MIT",
+  "keywords": [
+    "Neon Relic",
+    "Foundry",
+    "Foundry VTT",
+    "Year Zero Engine",
+    "TTRPG",
+    "mission template"
+  ],
+  "author": "Bruce",
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "clean": "node tools/build.mjs --clean",
+    "validate": "node tools/validate-packs.mjs",
+    "validate:self-test": "node tools/validate-packs.mjs --self-test",
+    "audit": "node tools/audit-build.mjs",
+    "emit:uuids": "node tools/emit-uuids.mjs"
+  },
+  "devDependencies": {
+    "classic-level": "^3.0.0",
+    "fs-extra": "^11.2.0",
+    "js-yaml": "^4.1.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+pathconfig
+.DS_Store
+scratch/
+
+# Internal art/reference material that must never ship in the module.
+# Any directory named "references" under src/assets/ is excluded by the build.
+src/assets/**/references/

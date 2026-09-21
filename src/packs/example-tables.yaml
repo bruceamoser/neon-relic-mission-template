@@ -1,0 +1,25 @@
+# Example Mission — Mission Tables (RollTable pack)
+# Tables: rollTable (results are compiled as separate entries automatically)
+#
+# Roll tables are cheap drama engines: a d6 of complications keeps a quiet
+# session moving. The `range` values must tile the die with no gaps.
+---
+
+- _id: example-table-complications
+  name: 'Lantern Room Complications (d6)'
+  type: rollTable
+  system:
+    formula: 1d6
+    entries:
+      - range: [1, 1]
+        result: 'A restorer''s lamp refuses to stay lit within ten feet of the storeroom door — and the restorer has started asking the house electrician why.'
+      - range: [2, 2]
+        result: 'The Circle''s analyst books the viewing slot immediately after the cell''s and leaves a listening device disguised as a lot ticket.'
+      - range: [3, 3]
+        result: 'A rival bidder arrives early and takes the only table with a view of the consignment office — one long afternoon of being watched.'
+      - range: [4, 4]
+        result: 'The courier telephones the house asking for Clarke by name. The switchboard message pad is the only record, and it is on the front desk.'
+      - range: [5, 5]
+        result: 'Cold spikes in the cellar; a junior porter refuses to make the intake run and swears the shelves are breathing.'
+      - range: [6, 6]
+        result: 'Mrs. Halloway summons the cell to her office — politely — to explain, precisely, why three separate parties are asking about Lot 41.'

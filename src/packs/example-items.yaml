@@ -1,0 +1,97 @@
+# Example Mission — Relics & Equipment (Item pack)
+# Items: artifact, weapon, gear
+#
+# Item sheets use the neon-relic system's full data models. This file shows the
+# three most common mission items; the system also provides armor, consumable,
+# talent, criticalInjury, anchor, darkSecret, upgrade, subdivision, relicSheet.
+#
+# The `artifact` type is the case's centrepiece relic: its containment profile
+# (trigger / appetite / quiescence) MUST agree with the DA case brief.
+---
+
+- _id: example-artifact-lantern
+  name: 'The Lantern of the Vigil'
+  type: artifact
+  img: modules/neon-relic-mission-template/assets/examples/example-card-intel.svg
+  system:
+    # tier 1–3 drives corruption cost and encumbrance (corruptionCost = tier)
+    tier: 3
+    corruptionCost: 3
+    # artifactDie is the usage die rolled to activate; it steps down as it burns
+    artifactDie:
+      current: d8
+      starting: d8
+    activationCondition: >
+      An open flame within near range of the unshrouded lantern — a match, a
+      lighter, a struck candle. The vigil-light pulls toward it for as long as
+      it burns.
+    effect: >
+      <p>The lantern's flame becomes a pillar of winter-coloured fire. In its
+      light, the recently dead are visible as they were last week — and
+      anything that died afraid will answer questions. Every question asked
+      costs the asker 1 Corruption; the lantern cannot be made to lie, but it
+      speaks in the dead person's voice and vocabulary.</p>
+    fractureCondition: >
+      If the lantern is lit while unshrouded outdoors in rain, the flame
+      shatters the crown glass (see the fracture table).
+    emission:
+      type: luminous
+      radius: short
+      trigger: on activation
+      corruptionAmount: 1
+      isSuppressed: false
+    containmentProfile:
+      type: shrouded storage, below ground
+      isContained: true
+      truths:
+        triggerCondition: Flame within near range of the unshrouded lantern.
+        appetite: The flame doubles its radius for every full shift it burns; it prefers to be carried somewhere high and dry.
+        quiescenceCondition: Shrouded in cloth and stored below ground; it settles within a shift of going dark.
+    encumbrance: 3
+    replicable: false
+    loreIdentified: false
+    description: >
+      <p>Blackened brass, crown glass scratched by a century of transit, a
+      carrying ring worn smooth. The lantern is older than its papers claim
+      and has been relit more often than its file admits.</p>
+
+- _id: example-weapon-sidearm
+  name: 'Revolver (.38)'
+  type: weapon
+  system:
+    description: >
+      A collector's revolver with six rounds older than the auction house
+      carrying it. Clean, heavy, and honest about what it is.
+    damage: 1
+    range: short
+    skill: firearms
+    targetAttribute: agi
+    # gear dice: weapons degrade on 1s — when value hits 0 the weapon is broken
+    gearBonus:
+      value: 1
+      max: 1
+    encumbrance: 1
+    worn: true
+    cl: 1
+    ammoDie:
+      current: d6
+      starting: d6
+    traits:
+      reliable: true
+
+- _id: example-gear-ledger-kit
+  name: 'Consignment Ledger Kit'
+  type: gear
+  system:
+    description: >
+      A blank-house letterhead, transferable ink and a day-old stamp: the tools
+      of anyone who belongs in an auction house and expects to be asked for
+      their papers.
+    gearBonus:
+      value: 1
+      max: 1
+    encumbrance: 1
+    worn: true
+    cl: 2
+    skillBonus: manipulate
+    isBroken: false

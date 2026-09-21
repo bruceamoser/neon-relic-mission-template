@@ -1,0 +1,29 @@
+# Example Mission — Scenes (Scene pack)
+# Scenes: scene
+#
+# The module landing scene: a splash page the Content Installer imports and
+# activates automatically when the world has no active scene. The
+# `landingPage` flag (namespaced to YOUR module id — remember to rename it
+# when you rename the module) tells scripts/main.mjs which scene to activate.
+---
+
+- _id: example-scene-landing
+  name: 'Example Mission — Landing Page'
+  type: scene
+  navName: 'Example'
+  navigation: true
+  initial: true
+  background:
+    src: modules/neon-relic-mission-template/assets/examples/example-landing.svg
+  width: 1672
+  height: 941
+  padding: 0
+  globalLight: true
+  darkness: 0
+  tokenVision: false
+  grid:
+    type: 0
+    size: 100
+  flags:
+    neon-relic-mission-template:
+      landingPage: true

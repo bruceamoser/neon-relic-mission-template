@@ -1,0 +1,133 @@
+# Example Mission — Information Cards (Item pack)
+# Documents: informationCard
+#
+# Every clue, piece of evidence, and cast dossier in the case file is an
+# informationCard. The `cardType` field is either:
+#   - supportingIntel — evidence, documents, observations (id labels "I-#")
+#   - containmentTruth — the three truths about the relic (id labels "CT#")
+#
+# AUTHORING RULES (player-facing `content`):
+#   - Intel cards describe the EVIDENCE at a glance (or quote the document).
+#   - Cast cards (a card about a PERSON) are the Covenant's file folder on that
+#     person — identity, description, record, assessment. NEVER describe the
+#     artwork: the image is the image, and players open it with Examine Photo.
+#   - Keep both spoiler-free: no locations of future scenes, no "this will
+#     matter later" hints, no cross-card references. The DA notes hold all of
+#     that, in the four-part house format:
+#       Retrieval / Reading the image / Clues & easter eggs / DA truth.
+---
+
+- _id: example-ic01
+  name: "I1 — The Courier's Inventory Slip"
+  type: informationCard
+  img: modules/neon-relic-mission-template/assets/examples/example-card-intel.svg
+  system:
+    cardId: I-1
+    cardType: supportingIntel
+    content: >
+      <p>A carbon copy of the courier's triplicate consignment slip, torn at the
+      pin corner. The fields are filled in a flat clerical hand:</p>
+      <p><em>Consignment 4416-C — one ceremonial lantern, glass and blackened
+      brass, Continental, late C19. Danger class: shelved. Route: Dover —
+      Bermondsey — vault transfer. Authorising seal: field office, unregistered.</em></p>
+      <p>In the margin, not part of the form: <em>carrier instruction — do not
+      unwrap in motion.</em></p>
+    # foundAt / knownBy / npc slugs compile into UUID arrays (foundAtUuids,
+    # knownByUuids, npcUuids). Unknown slugs fail the build.
+    foundAtSlugs: [example-l1]
+    knownBySlugs: [example-npc-curator]
+    hqFallback: 11
+    daNotes: >
+      <p><strong>Retrieval.</strong> The consignment office copy is filed among
+      the house's intake papers — found during a viewing day walkthrough, or
+      served up by Clarke under pressure.</p>
+      <p><strong>Reading the image.</strong> A handler's evidence photograph:
+      carbon paper in raking light, pin-hole at the corner, the clerical hand
+      steady, the margin note pressed harder than the form.</p>
+      <p><strong>Clues &amp; easter eggs.</strong> "Do not unwrap in motion" is
+      not Covenant procedure — the courier wrote it himself, and it reads like
+      a man convincing himself.</p>
+      <p><strong>DA truth.</strong> The slip proves the lantern entered the
+      house lawfully consigned. Clarke's initials sit in the received-by box —
+      pressed, not signed, as if he wanted the option to deny it.</p>
+    foundAtUuids: []
+    knownByUuids: []
+    npcUuids: []
+
+- _id: example-ic02
+  name: I2 — Lot 41 in the Consignment Book
+  type: informationCard
+  img: modules/neon-relic-mission-template/assets/examples/example-card-intel.svg
+  system:
+    cardId: I-2
+    cardType: supportingIntel
+    content: >
+      <p>The consignment book lies open at the week's intake. Lot 41's entry,
+      in the auctioneer's own hand, reads:</p>
+      <p><em>One lantern of devotional pattern, blackened brass with crown
+      glass, Continental, late C19. Provenance: private collection, undisclosed.
+      Reserve: on application. Notes: glass pane fitted post-manufacture; not to
+      be lit for display.</em></p>
+      <p>The provenance line is the only one on the page without a name against
+      it.</p>
+    foundAtSlugs: [example-l1]
+    hqFallback: 12
+    daNotes: >
+      <p><strong>Retrieval.</strong> Available any time the cell gets into the
+      auctioneer's working office — quietly, or as registered bidders during a
+      viewing.</p>
+      <p><strong>Reading the image.</strong> An open ledger in green baize
+      light; ruled columns; the one blank provenance line a visible absence.</p>
+      <p><strong>Clues &amp; easter eggs.</strong> "Not to be lit for display"
+      is house policy for gas and oil lamps — the restorer applied it to a
+      relic worth a house's yearly turnover, which means somebody saw it lit
+      and wrote a rule instead of a report.</p>
+      <p><strong>DA truth.</strong> The reserve is "on application" because
+      Clarke cannot price it and will not admit it. The Ember Circle's analyst
+      has already requested the same page.</p>
+    foundAtUuids: []
+    knownByUuids: []
+    npcUuids: []
+
+- _id: example-ic03
+  name: N1 — Desmond Clarke
+  type: informationCard
+  img: modules/neon-relic-mission-template/assets/examples/example-portrait.svg
+  system:
+    cardId: N-1
+    cardType: supportingIntel
+    # ── CAST CARD ── content is what the player finds opening the Covenant's
+    # file folder on this person. Identity → Description → record/patterns →
+    # Assessment. Never a description of the artwork.
+    content: >
+      <p><strong>Dossier — Desmond Clarke.</strong> Procurator of consignments,
+      the Lantern Room auction house, Mayfair; forty-one. In Covenant records
+      only since this case: a name on a customs blotter and now a signature on
+      a consignment slip.</p>
+      <p>Description: neat, soft-spoken; good suit worn like armour; a
+      handshake held a beat too long. Record: twelve years at the house, no
+      complaint, no scandal — and, since spring, a clientele of his own that he
+      does not discuss with the house.</p>
+      <p><em>Assessment: knows more than he has said and wants to be asked. He
+      will talk first, lie second, and cut a deal third — in that order, every
+      time.</em></p>
+    foundAtSlugs: [example-l1]
+    npcSlugs: [example-npc-curator]
+    hqFallback: 0
+    daNotes: >
+      <p><strong>Retrieval.</strong> Pair the card with the first Clarke
+      encounter — his consignment office, or the viewing-day floor.</p>
+      <p><strong>Reading the image.</strong> A surveillance frame the house
+      would never recognise as one: Clarke in the consignment doorway, one
+      hand on the ledgers, eyes on the visitor rather than the case he is
+      signing for.</p>
+      <p><strong>Clues &amp; easter eggs.</strong> The fountain pen clipped to
+      his waistcoat is the house's twelve-year service pen. His new watch is
+      not priced from a procurator's salary, and the cell should wonder who
+      paid for it.</p>
+      <p><strong>DA truth.</strong> Clarke opened the case because a private
+      buyer asked him to hold it back from open sale. He has not taken the
+      buyer's money yet — the players arrive before the point of no return,
+      but only just.</p>
+    foundAtUuids: []
+    npcUuids: []

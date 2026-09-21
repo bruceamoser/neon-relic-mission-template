@@ -1,0 +1,235 @@
+# Example Mission — Case Briefs (Item pack)
+# Documents: playerCaseBrief (VC-18 player dossier), daCaseBrief (VC-17 DA brief),
+#            caseBoard (14-day operations board), informationWeb (clue node graph)
+#
+# Every document type shown here is a neon-relic system Item sub-type. Field
+# names and ranges mirror the system's data models — see:
+#   https://github.com/bruceamoser/foundry-neon-relic-system (src/data/item-models.mjs)
+#
+# Authoring rules of thumb:
+#   - `_id` is your authoring slug; the build converts it to a deterministic
+#     16-char Foundry id. Cross-references use slugs (see `npcSlugs` etc.).
+#   - playerCaseBrief is PLAYER-VISIBLE. Keep it spoiler-free.
+#   - daCaseBrief, caseBoard milestones and daNotes are DA-ONLY.
+---
+
+# ────────────────────────────────────────────────────────────────
+# PLAYER CASE BRIEF — the dossier you hand the players at the start
+# ────────────────────────────────────────────────────────────────
+- _id: example-brief-player
+  name: 'OSPREY-65-001 — Player Dossier'
+  type: playerCaseBrief
+  system:
+    caseId: EXAMPLE-65-001
+    caseName: 'The Lantern Room'
+    region: 'Region 03 — British Isles / London'
+    classification: RESTRICTED
+    situationSummary: >
+      <p>Three nights ago a Covenant courier failed to arrive at the London
+      waystation. His van was recovered empty in a Camden mews; the containment
+      lantern he was transferring — <strong>the Lantern of the Vigil</strong> —
+      is missing. The courier has not been found.</p>
+      <p>Wayfinder trace analysis puts the lantern's activation residue inside a
+      private auction house in Mayfair. A discreet sale is scheduled within two
+      weeks. The house does not know what it is selling; its clients would pay
+      any price to find out.</p>
+      <p>This is a recovery operation under time pressure. Discretion is part of
+      the objective: the auction house must remain unaware of the Covenant, and
+      the lantern must not reach a buyer's shelf.</p>
+    primaryObjective: >
+      <p><strong>Primary:</strong> Recover the Lantern of the Vigil intact and
+      return it to Covenant custody.</p>
+    secondaryObjective: >
+      <p><strong>Secondary:</strong> Establish how the lantern left the courier's
+      custody — and who inside the house knows more than an auctioneer should.</p>
+    knownOrganizations: >
+      <p><strong>The Ember Circle.</strong> A collectors' network that buys
+      occult material for private display. Two known Circle agents are in London
+      this month. They are not violent by policy — they prefer to outbid, then
+      outmaneuver.</p>
+    # The system pads this table to six rows. List the people the cell may
+    # contact before play; each row is name / role / what they know.
+    initialContacts:
+      - name: 'Desmond Clarke'
+        role: 'Procurator — consignments, the auction house'
+        knownInfo: 'Signs for everything that crosses the house threshold. Nervous, precise, and newly wealthy.'
+      - name: 'Covenant Logistics Officer'
+        role: 'Recovery Division — Region 03 desk'
+        knownInfo: 'Your supply line: kit, vehicles, and a safehouse in Bermondsey.'
+      - name: 'Wayfinder Remote-Sensing Analyst'
+        role: 'Covenant HQ — monitoring wing'
+        knownInfo: 'Holds the lantern''s last stable trace readings. Can task follow-up analysis by request packet.'
+      - name: 'The Keep — Registrar'
+        role: 'Vault administration'
+        knownInfo: 'Can confirm the lantern''s containment profile and what happens if it opens.'
+      - name: 'Inspector Aline Mercer'
+        role: 'Metropolitan Police — pawnbrokers'' desk (contact of record)'
+        knownInfo: 'Owes the Covenant one favour and knows not to ask what it is for.'
+      - name: 'Mrs. Edith Halloway'
+        role: 'Principal auctioneer'
+        knownInfo: 'Runs the house and its client list. Reputation is her currency; she sells nothing she cannot source lawfully.'
+    startingLeads: >
+      <p><strong>The Camden mews</strong> — where the courier's van was
+      abandoned. <strong>The auction house</strong> — Mayfair; viewing days are
+      open to registered bidders. <strong>The courier's flat</strong> — not yet
+      searched by anyone who knows what he carried.</p>
+    timelinePressure: >
+      <p>The sale is scheduled in fourteen days. Registering as bidders takes
+      documentation; the house vets its clients. Once the Circle is registered
+      and funded, discretion is gone.</p>
+    constraints: >
+      <ul>
+      <li>No overt Covenant presence on house premises. A scandal closes the house and moves the lantern.</li>
+      <li>The lantern must be recovered intact — it is containment-rated, not inert.</li>
+      <li>The Circle will be watching the same doors you are.</li>
+      </ul>
+    description: >
+      <p>Player-facing dossier for Operation File <strong>EXAMPLE-65-001</strong>.
+      Issue to the cell at the start of the case.</p>
+
+# ────────────────────────────────────────────────────────────────
+# DA CASE BRIEF — the Director Agent's master reference (SPOILERS)
+# ────────────────────────────────────────────────────────────────
+- _id: example-brief-da
+  name: 'EXAMPLE-65-001 — DA Case Brief'
+  type: daCaseBrief
+  system:
+    caseId: EXAMPLE-65-001
+    caseName: 'The Lantern Room'
+    relicTier: 3
+    region: 'Region 03 — British Isles / London'
+    # I — The mystery as the players first understand it
+    mysteryStatement: >
+      <p>A containment lantern vanished with its courier, and a Mayfair auction
+      house is selling it to private collectors in fourteen days.</p>
+    # II — What is actually happening
+    realSituation: >
+      <p>The courier was not robbed: he panicked. Registry records show the
+      lantern's quiescence window closing, and a courier who had been told —
+      wrongly — that the lantern feeds on carriers. He stashed the case with a
+      fence who consigns through the auction house, then went to ground.</p>
+      <p>Clarke, the procurator, opened the case out of curiosity and listed
+      Lot 41 without understanding it. The Ember Circle is in London because
+      their own analyst read the same trace the Covenant did.</p>
+    # III — Objectives (DA restatement, with the hidden half)
+    primaryObjective: >
+      <p><strong>Primary:</strong> Recover the lantern before Lot 41 falls under
+      the gavel — and before its quiescence window closes in the unventilated
+      storeroom it currently sits in.</p>
+    secondaryObjective: >
+      <p><strong>Secondary:</strong> Find the courier alive if possible: he is
+      the only witness to who else saw the lantern lit.</p>
+    # IV — The three containment truths (these MUST be defined for a relic case)
+    containmentTrigger: >
+      <p><strong>Trigger.</strong> Flame. Any open flame within near range of
+      the unshrouded lantern — including a lighter, a match, or a struck
+      candle — pulls the vigil-light into it for as long as it burns.</p>
+    containmentAppetite: >
+      <p><strong>Appetite.</strong> The flame grows wanting: a cupped flame
+      becomes a lantern flame becomes a pillar of winter-coloured fire. Each
+      shift it burns under the vigil-light, the flame's radius doubles.</p>
+    containmentQuiescence: >
+      <p><strong>Quiescence.</strong> The lantern settles when shrouded in
+      cloth and stored below ground. The house's cellar storeroom is
+      incidentally safe — until the sale moves it upstairs under spotlights.</p>
+    keyActors: >
+      <p><strong>Desmond Clarke</strong> — guilt and greed in a good suit; he
+      will talk first, lie second, cut a deal third. <strong>Mrs. Halloway</strong>
+      — not complicit, not stupid; protects the house over any client. <strong>The
+      Ember Circle</strong> — outbidders and opportunists; their field agent can
+      be bought but never owns up to a promise.</p>
+    bestCaseResolution: >
+      <p>The lantern is swapped for the display case during viewing day, Lot 41
+      is withdrawn citing provenance failure, and Clarke quietly confesses
+      where the courier is hiding.</p>
+    worstCaseResolution: >
+      <p>Lot 41 sells, the Circle lights it on the gala night, and a pillar of
+      winter fire turns a Mayfair ballroom into a story the papers report as a
+      gas accident.</p>
+    # VII — Relic milestones: what the artifact does day-by-day if uncontained
+    relicMilestones:
+      - day: 12
+        description: 'The storeroom air turns cold; the house''s cats refuse the cellar.'
+      - day: 10
+        description: 'A restorer photographs Lot 41 and finds the flame in the glass already lit.'
+      - day: 4
+        description: 'The quiescence window closes: any open flame on the premises pulls at the light for a full round.'
+      - day: 1
+        description: 'Gala night. Every candle on the tables leans toward Lot 41.'
+    # VIII — DA-only operational notes
+    daNotes: >
+      <p><strong>Pacing.</strong> Weeks of slow burn; the last three days are
+      all clock. Give the players one free day to plan the viewing, then start
+      charging shifts.</p>
+      <p><strong>Fail forward.</strong> If the cell stalls on access, the Circle
+      agent makes a clumsy register attempt that exposes the house's vetting
+      process as their opening.</p>
+    description: >
+      <p>Director Agent master reference — SPOILERS throughout. Not for player
+      eyes.</p>
+
+# ────────────────────────────────────────────────────────────────
+# CASE BOARD — the 14-day operations clock
+# ────────────────────────────────────────────────────────────────
+- _id: example-case-board
+  name: 'EXAMPLE-65-001 — Case Board'
+  type: caseBoard
+  system:
+    caseId: EXAMPLE-65-001
+    caseName: 'The Lantern Room'
+    region: 'Region 03 — British Isles / London'
+    currentDay: 14
+    shiftsFilled: []
+    # Relic milestones fire on day values and surface on the board as the clock
+    # advances. Keep the count small — 2–6 per case.
+    relicMilestones:
+      - day: 10
+        description: 'M1 — The storeroom chill: any open flame in the house begins to bend toward the cellar.'
+      - day: 4
+        description: 'M2 — The quiescence window closes; the house still believes Lot 41 is a curiosity.'
+      - day: 1
+        description: 'M3 — Gala night: candles lean toward the auction floor.'
+    # Faction tracks and person tracks are the same structure. A faction uses
+    # `orgSlug` → an organization document; a person track uses `orgSlug` → an
+    # npc document (people act as self-organizations away from the table).
+    organizations:
+      - id: O1
+        name: 'The Ember Circle'
+        orgSlug: example-org1
+        value: 0
+        active: true
+        dormant: false
+        squaresConsumed: []
+        milestones:
+          - day: 9
+            label: O1M1
+            description: 'Their analyst confirms Lot 41 matches the covenant trace. Funding is wired to London.'
+          - day: 2
+            label: O1M2
+            description: 'The Circle registers a proxy bidder under a false provenance claim.'
+      - id: P1
+        name: 'Desmond Clarke'
+        orgSlug: example-npc-curator
+        value: 0
+        active: true
+        dormant: false
+        squaresConsumed: []
+        milestones:
+          - day: 12
+            label: P1M1
+            description: 'Opens the case in the storeroom; sees the flame already burning and tells no one.'
+          - day: 3
+            label: P1M2
+            description: 'Tries to source a private buyer to cancel the auction quietly; the Circle''s agent gets there first.'
+    informationCardSlugs: [example-ic01, example-ic02, example-ic03]
+
+# ────────────────────────────────────────────────────────────────
+# INFORMATION WEB — which clue cards exist and how the web renders
+# ────────────────────────────────────────────────────────────────
+- _id: example-information-web
+  name: 'EXAMPLE-65-001 — Information Web'
+  type: informationWeb
+  system:
+    # List every informationCard slug that belongs to this case. The web view
+    # draws the found-at / known-by / npc links compiled into each card.
+    informationCardSlugs: [example-ic01, example-ic02, example-ic03]

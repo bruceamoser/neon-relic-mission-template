@@ -1,0 +1,111 @@
+{
+  "id": "neon-relic-mission-template",
+  "title": "Mission Template (Example Content)",
+  "description": "<p>A working template for building <strong>Neon Relic</strong> mission modules for Foundry VTT v14 — with example content for every document type (case briefs, case board, information cards, locations, factions, NPCs, relics, journals, tables, and a landing scene).</p><p>Use this as the starting point for your own case file: rename the module id, replace the example packs with your mission, set your own manifest URLs, then build, test, and release using the included tooling. See the repository README and CONTENT-GUIDE.md for the full authoring reference.</p><p>Requires the <strong>neon-relic</strong> game system — this module is not compatible with any other system.</p>",
+  "version": "0.1.0",
+  "esmodules": [
+    "scripts/main.mjs"
+  ],
+  "compatibility": {
+    "minimum": 14,
+    "verified": 14
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "neon-relic",
+        "type": "system",
+        "manifest": "https://github.com/bruceamoser/foundry-neon-relic-system/releases/latest/download/system.json",
+        "compatibility": {
+          "minimum": "0.11.1",
+          "verified": "0.11.1"
+        }
+      }
+    ]
+  },
+  "packs": [
+    {
+      "name": "example-briefs",
+      "label": "Case Briefs",
+      "path": "packs/example-briefs",
+      "type": "Item",
+      "system": "neon-relic"
+    },
+    {
+      "name": "example-npcs",
+      "label": "Cast & Antagonists",
+      "path": "packs/example-npcs",
+      "type": "Actor",
+      "system": "neon-relic"
+    },
+    {
+      "name": "example-clues",
+      "label": "Information Cards",
+      "path": "packs/example-clues",
+      "type": "Item",
+      "system": "neon-relic"
+    },
+    {
+      "name": "example-sites",
+      "label": "Locations & Factions",
+      "path": "packs/example-sites",
+      "type": "Item",
+      "system": "neon-relic"
+    },
+    {
+      "name": "example-items",
+      "label": "Relics & Equipment",
+      "path": "packs/example-items",
+      "type": "Item",
+      "system": "neon-relic"
+    },
+    {
+      "name": "example-tables",
+      "label": "Mission Tables",
+      "path": "packs/example-tables",
+      "type": "RollTable",
+      "system": "neon-relic"
+    },
+    {
+      "name": "example-journals",
+      "label": "Mission Journals",
+      "path": "packs/example-journals",
+      "type": "JournalEntry",
+      "system": "neon-relic"
+    },
+    {
+      "name": "example-scenes",
+      "label": "Landing Scene",
+      "path": "packs/example-scenes",
+      "type": "Scene"
+    }
+  ],
+  "packFolders": [
+    {
+      "name": "Example Mission",
+      "sorting": "m",
+      "color": "#2d5a46",
+      "packs": [
+        "example-briefs",
+        "example-npcs",
+        "example-clues",
+        "example-sites",
+        "example-items",
+        "example-tables",
+        "example-journals",
+        "example-scenes"
+      ]
+    }
+  ],
+  "manifest": "https://github.com/bruceamoser/neon-relic-mission-template/releases/latest/download/module.json",
+  "download": "https://github.com/bruceamoser/neon-relic-mission-template/releases/latest/download/neon-relic-mission-template.zip",
+  "authors": [
+    {
+      "name": "YOUR NAME"
+    }
+  ],
+  "url": "https://github.com/bruceamoser/neon-relic-mission-template",
+  "bugs": "https://github.com/bruceamoser/neon-relic-mission-template/issues",
+  "changelog": "https://github.com/bruceamoser/neon-relic-mission-template/releases",
+  "flags": {}
+}

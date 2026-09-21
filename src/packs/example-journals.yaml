@@ -1,0 +1,67 @@
+# Example Mission — Mission Journals (JournalEntry pack)
+# Journals: journalEntry (pages are compiled as separate entries automatically)
+#
+# Two patterns are shown:
+#   - a PLAYER handout journal (pages the DA shows or shares with players)
+#   - a DA-only journal (run sheets / walkthroughs — never hand these over)
+#
+# AUTHORING RULES:
+#   - Player handout pages follow the same content policy as cards: no
+#     spoilers, no DA stage directions, no "hand this to the players" notes on
+#     the page itself.
+#   - Give DA-only journals an obvious title (suffix "DA Run Sheet" etc.).
+# ---------------------------------------------------------------------------
+
+- _id: example-journal-handouts
+  name: 'Example Mission — Handouts'
+  type: journalEntry
+  pages:
+    - name: "Handout 1 — The Courier's Note"
+      type: text
+      text:
+        content: >
+          <p><em>A page torn from a pocket notebook, found under the van's
+          passenger seat. Handwritten, pressed hard enough to emboss the next
+          sheet.</em></p>
+          <blockquote>
+          <p>It gets cold when I stop moving. The cold is worse than the men at
+          the mews. If you are reading this and it is cold where you are, do
+          not open the case — and tell them I am sorry I ran.</p>
+          </blockquote>
+    - name: 'Handout 2 — Auction Registration Card'
+      type: text
+      text:
+        content: >
+          <p>A stiff card in house livery, issued at the desk on a viewing
+          day:</p>
+          <p><em>THE LANTERN ROOM — registered bidder, number 217. Admit the
+          bearer to the floor during viewing hours. This card is not
+          transferable and does not authorise access to consignment areas.</em></p>
+
+- _id: example-journal-da-run
+  name: 'EXAMPLE-65-001 — DA Run Sheet'
+  type: journalEntry
+  pages:
+    - name: 'Run Sheet — Days 14 to 1 (DA)'
+      type: text
+      text:
+        content: >
+          <p><strong>DA only.</strong> Day-by-day direction for running the
+          case. This is the pattern the Sangreal mission's walkthrough uses —
+          one page per act or per day, named so the DA can find the current
+          night in one click.</p>
+          <h3>Days 14–10 — Cover</h3>
+          <p>The cell arrives, registers, learns the house. Clarke is
+          approachable but evasive; the viewing floor is open. Introduce the
+          Circle's analyst as a rival bidder and let the players place him.</p>
+          <h3>Days 9–5 — The Ledger</h3>
+          <p>The consignment book (I2) is the hinge. Any route that gets eyes
+          on it moves the case: the provenance line is blank, the reserve is
+          unpriced, and Clarke's initials sit in the margin.</p>
+          <h3>Days 4–2 — The Cold Room</h3>
+          <p>The quiescence window closes. The storeroom is now the story: the
+          air is wrong, the restorer's lamp will not stay lit near the crate.
+          This is where the Circle makes its move on the vetting clerk.</p>
+          <h3>Day 1 — Gala Night</h3>
+          <p>Everything at once: Lot 41 on the block, candles leaning, and a
+          decision about who gets to walk out with the lantern.</p>

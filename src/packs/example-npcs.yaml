@@ -1,0 +1,79 @@
+# Example Mission — Cast & Antagonists (Actor pack)
+# Actors: npc, mob
+#
+# Actor sheets are DA-ONLY by default (they carry stats, secrets, and mission
+# goals). The player-facing material about a person belongs in their cast card
+# (see example-clues.yaml → N1) and in the case briefs.
+#
+# The system also provides actor types agent, vehicle, and headquarters — those
+# are used in play (and by the HQ/wizard tooling), not typically shipped as
+# mission content. npc and mob are a mission's bread and butter.
+---
+
+- _id: example-npc-curator
+  name: 'Desmond Clarke'
+  type: npc
+  img: modules/neon-relic-mission-template/assets/examples/example-portrait.svg
+  prototypeToken:
+    texture:
+      src: modules/neon-relic-mission-template/assets/examples/example-portrait.svg
+  system:
+    # tier drives corruption cost / threat framing (1 = minor, 4 = major threat)
+    tier: 2
+    # `description` is the DA-only stat-block prose shown on the actor sheet
+    description: >
+      <h3>Psychological Profile</h3>
+      <p>A man holding two ledgers: the house's and his own. He did not steal
+      the lantern — he opened a case he was paid to hold, and what he saw made
+      the decision for him. Now he is trying to sell the problem before it
+      sells him.</p>
+      <h3>Social Mechanics</h3>
+      <p>Guarded (Difficulty 2). Flattery opens him; pressure closes the
+      office door. Presenting proof that the lantern is dangerous moves him to
+      Open (+1): he wants to be rescued from his own decision.</p>
+      <h3>Combat Profile</h3>
+      <p>Non-combatant. Will run rather than fight, and knows the house's
+      service corridors better than anyone.</p>
+    attributes:
+      str: 2
+      agi: 3
+      wit: 4
+      emp: 3
+    # skills is sparse — list only what the NPC actually has (valid keys:
+    # force, endure, brawl, firearms, deftHands, sneak, tech, investigate,
+    # lore, psychoanalyze, manipulate, command, healMental, healPhysical)
+    skills:
+      investigate: 3
+      manipulate: 3
+      lore: 2
+    armorRating: 0
+    fearRating: 0
+    disposition: 3
+    corruptionStage: 0
+    tags:
+      - example
+    # ── Operations Board fields (used by the case board person track) ──
+    secret: 'He opened the lantern case for a private buyer — and photographed what he saw.'
+    goal: 'Sell Lot 41 to someone discreet before the house discovers what he did.'
+    positiveResult: 'Talks: I1, I2. Surrenders the storeroom key and the buyer''s letter.'
+    negativeResult: 'Withdraws Lot 41 and vanishes into his own clientele.'
+    # Authoring slugs resolve to UUID arrays at build time.
+    startingKnowledgeSlugs: [example-ic01]
+
+- _id: example-mob-floor-security
+  name: 'Auction Floor Security'
+  type: mob
+  img: modules/neon-relic-mission-template/assets/examples/example-portrait.svg
+  system:
+    # memberCount drives the shared pool; sharedPool and bonusDice are derived
+    # by the system at runtime.
+    memberCount: 3
+    memberHP: 4
+    sharedPool: 9
+    bestPool: 5
+    bonusDice: 2
+    description: >
+      <p>Three licensed door staff in house livery — professional, bored, and
+      exactly as alert as their pay demands. They intervene on disturbance,
+      not curiosity. A quiet argument is a conversation; a raised voice is a
+      removal.</p>

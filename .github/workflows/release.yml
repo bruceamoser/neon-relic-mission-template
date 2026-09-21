@@ -1,0 +1,112 @@
+# Release CI — revalidates and (re-)attaches release artifacts on publish.
+#
+# The module id is derived from dist/module.json at build time, so this
+# workflow works unchanged for any module created from the template.
+# It attaches the zip only when missing (so a locally-attached large zip is
+# never re-uploaded through the runner) and always refreshes module.json.
+name: Release CI
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v0.1.0)'
+        required: true
+        type: string
+
+env:
+  TYPE: module
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & Attach Release Artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📡 Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || github.event.inputs.version }}
+
+      - name: ⚙️ Setup NodeJS 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: 🔧 Install Dependencies
+        run: npm ci
+
+      - name: ✅ Validate Pack Sources
+        run: npm run validate
+
+      - name: 🧱 Build Project
+        run: npm run build
+
+      - name: 📄 Get Module ID
+        id: id
+        run: |
+          ID=$(node -p "require('./dist/module.json').id")
+          echo "id=$ID" >> $GITHUB_OUTPUT
+
+      - name: 📄 Get Version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./dist/module.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+
+      - name: 📝 Set Manifest to Latest
+        id: manifest_link
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: dist/${{ env.TYPE }}.json
+        env:
+          manifest: https://github.com/${{ github.repository }}/releases/latest/download/${{ env.TYPE }}.json
+
+      - name: 📦 Create ZIP Archive
+        run: |
+          cd dist/
+          zip -r ../${{ steps.id.outputs.id }}.zip *
+
+      - name: 🚀 Upload Release Artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ github.event.release.tag_name || steps.version.outputs.tag }}"
+          ZIP_NAME="${{ steps.id.outputs.id }}.zip"
+          ZIP="./${ZIP_NAME}"
+          MANIFEST="./dist/${{ env.TYPE }}.json"
+          existing="$(gh release view "$TAG" --json assets -q '.assets[].name' || true)"
+          upload() {
+            for attempt in 1 2 3; do
+              echo "Upload attempt $attempt: $1"
+              if gh release upload "$TAG" "$1" --clobber; then
+                return 0
+              fi
+              sleep 15
+            done
+            return 1
+          }
+          if printf '%s\n' "$existing" | grep -qx "$ZIP_NAME"; then
+            echo "Zip '$ZIP_NAME' is already attached — skipping large-asset upload."
+          else
+            echo "Zip '$ZIP_NAME' missing — attaching from CI build."
+            upload "$ZIP" || { echo "Zip upload failed after 3 attempts" >&2; exit 1; }
+          fi
+          upload "$MANIFEST" || { echo "Manifest upload failed after 3 attempts" >&2; exit 1; }
+          echo "Artifacts verified for $TAG"
+
+      - name: 📋 Summary
+        run: |
+          echo "### ✅ Release Complete" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Module:** ${{ steps.id.outputs.id }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Manifest:** https://github.com/${{ github.repository }}/releases/latest/download/module.json" >> $GITHUB_STEP_SUMMARY
+          echo "**Download:** https://github.com/${{ github.repository }}/releases/latest/download/${{ steps.id.outputs.id }}.zip" >> $GITHUB_STEP_SUMMARY
