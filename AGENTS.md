@@ -77,6 +77,10 @@ descriptions** — and keep spoilers in `daNotes` / DA documents.
   on them is reset).
 - Foundry discovers new modules only at server start; content changes in the **world** require the
   Content Installer to re-run.
+- **A new pack is invisible until Foundry restarts**: compendium packs are registered at server
+  start, so a pack added to `static/module.json` by an update is absent from `game.packs` until the
+  app is restarted. The installer detects this and warns (`N pack(s) awaiting a Foundry restart`)
+  instead of skipping the pack silently — do not remove that check.
 - **Playlists compile to two entry kinds**: `!playlists!<id>` plus one
   `!playlists.sounds!<id>.<soundId>` per sound (v14 stores sounds separately, like journal pages).
   Never author `seed` (non-nullable integer — `seed: null` fails validation) or `channel` (required,

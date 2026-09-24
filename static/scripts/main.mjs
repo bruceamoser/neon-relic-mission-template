@@ -59,13 +59,19 @@ async function ensureFolder(name, type, parentId = null) {
 }
 
 /**
- * Build the import plan from the live compendium collections: every pack of
- * this module becomes a subfolder under the module root, except Scene packs
+ * Import plan derived from the LIVE compendium collections: every pack of this
+ * module becomes a subfolder under the module root, except Scene packs
  * (kept at the root so the landing scene is easy to find).
- * @returns {Array<{pack: string, type: string, label: string, folder: string|null}>}
+ *
+ * Also reports packs the manifest declares but this server has not registered:
+ * Foundry registers compendium packs at server start, so a pack added by a
+ * module update does not exist in `game.packs` until Foundry is restarted —
+ * without this check the installer would skip it silently.
+ * @returns {{plan: Array<{pack: string, type: string, label: string, folder: string|null}>, missing: string[]}}
  */
 function buildInstallPlan() {
   const plan = [];
+  const declared = [...(game.modules.get(MODULE_ID)?.packs ?? [])].map((p) => p.name);
   for (const pack of game.packs) {
     if (!pack.collection.startsWith(`${MODULE_ID}.`)) continue;
     const { name, label, type } = pack.metadata ?? {};
@@ -77,7 +83,8 @@ function buildInstallPlan() {
       folder: type === 'Scene' ? null : (label ?? name),
     });
   }
-  return plan;
+  const missing = declared.filter((name) => !game.packs.get(`${MODULE_ID}.${name}`));
+  return { plan, missing };
 }
 
 /**
@@ -142,7 +149,7 @@ async function installContent() {
     return;
   }
 
-  const plan = buildInstallPlan();
+  const { plan, missing } = buildInstallPlan();
   if (plan.length === 0) {
     ui.notifications.error(`${MODULE_ID} | no packs declared in the module manifest.`);
     return;
@@ -153,6 +160,15 @@ async function installContent() {
   let updated = 0;
   let failed = 0;
   const sceneStats = { repaired: 0 };
+
+  if (missing.length) {
+    ui.notifications.warn(
+      `${rootFolderName()} — this build added ${missing.length} new pack(s) that Foundry has not loaded yet: ${missing.join(', ')}. ` +
+        'Restart Foundry (quit the app, not just the world), then run the installer again.',
+      { permanent: true },
+    );
+    console.warn(`${MODULE_ID} | installer: packs declared but not registered`, missing);
+  }
 
   for (const { pack: packName, type, label, folder: subfolderName } of plan) {
     const pack = game.packs.get(`${MODULE_ID}.${packName}`);
@@ -217,7 +233,9 @@ async function installContent() {
   notification?.remove?.();
   const summary = `${rootFolderName()} — content ready (${created} new, ${updated} updated${
     sceneStats.repaired ? `, ${sceneStats.repaired} scenes repaired` : ''
-  }${failed ? `, ${failed} failed` : ''}).`;
+  }${failed ? `, ${failed} failed` : ''}${
+    missing.length ? `, ${missing.length} pack(s) awaiting a Foundry restart` : ''
+  }).`;
   console.log(`${MODULE_ID} | installer: ${summary}`);
   if (failed) {
     ui.notifications.error(`${failed} document(s) failed to install — see the console for details.`);
