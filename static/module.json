@@ -29,55 +29,87 @@
       "label": "Case Briefs",
       "path": "packs/example-briefs",
       "type": "Item",
-      "system": "neon-relic"
+      "system": "neon-relic",
+      "ownership": {
+        "ASSISTANT": "OWNER",
+        "PLAYER": "NONE"
+      }
     },
     {
       "name": "example-npcs",
       "label": "Cast & Antagonists",
       "path": "packs/example-npcs",
       "type": "Actor",
-      "system": "neon-relic"
+      "system": "neon-relic",
+      "ownership": {
+        "ASSISTANT": "OWNER",
+        "PLAYER": "NONE"
+      }
     },
     {
       "name": "example-clues",
       "label": "Information Cards",
       "path": "packs/example-clues",
       "type": "Item",
-      "system": "neon-relic"
+      "system": "neon-relic",
+      "ownership": {
+        "ASSISTANT": "OWNER",
+        "PLAYER": "NONE"
+      }
     },
     {
       "name": "example-sites",
       "label": "Locations & Factions",
       "path": "packs/example-sites",
       "type": "Item",
-      "system": "neon-relic"
+      "system": "neon-relic",
+      "ownership": {
+        "ASSISTANT": "OWNER",
+        "PLAYER": "NONE"
+      }
     },
     {
       "name": "example-items",
       "label": "Relics & Equipment",
       "path": "packs/example-items",
       "type": "Item",
-      "system": "neon-relic"
+      "system": "neon-relic",
+      "ownership": {
+        "ASSISTANT": "OWNER",
+        "PLAYER": "NONE"
+      }
     },
     {
       "name": "example-tables",
       "label": "Mission Tables",
       "path": "packs/example-tables",
       "type": "RollTable",
-      "system": "neon-relic"
+      "system": "neon-relic",
+      "ownership": {
+        "ASSISTANT": "OWNER",
+        "PLAYER": "NONE"
+      }
     },
     {
       "name": "example-journals",
       "label": "Mission Journals",
       "path": "packs/example-journals",
       "type": "JournalEntry",
-      "system": "neon-relic"
+      "system": "neon-relic",
+      "ownership": {
+        "ASSISTANT": "OWNER",
+        "PLAYER": "NONE"
+      }
     },
     {
       "name": "example-scenes",
-      "label": "Landing Scene",
+      "label": "Scenes",
       "path": "packs/example-scenes",
-      "type": "Scene"
+      "type": "Scene",
+      "ownership": {
+        "ASSISTANT": "OWNER",
+        "PLAYER": "NONE"
+      }
     }
   ],
   "packFolders": [

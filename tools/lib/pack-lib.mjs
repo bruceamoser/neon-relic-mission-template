@@ -43,6 +43,23 @@ export const ITEM_TYPES = new Set([
 export const ACTOR_TYPES = new Set(['agent', 'npc', 'mob', 'vehicle', 'headquarters']);
 
 /**
+ * Core schema version stamped onto authored Scene documents (`_stats.coreVersion`).
+ *
+ * Foundry runs its version migrations against every compendium record that lacks
+ * `_stats.coreVersion`. The v14.353 `migrateLevels` migration unconditionally
+ * rebuilds `levels` from the legacy top-level `background` field — for the modern
+ * serialization (background stored on the embedded Level, parent has no
+ * `background`) that silently discards the authored Level and with it the scene
+ * artwork, so scenes import blank. Stamping 14.353 (the first core version that
+ * stores scene backgrounds on Levels) tells v14.353+ the record already uses the
+ * modern schema, so nothing rewrites it.
+ *
+ * NEVER remove this stamp, and never re-add top-level `background` /
+ * `globalLight` / `darkness` to a scene document.
+ */
+export const SCENE_SCHEMA_CORE_VERSION = '14.353';
+
+/**
  * Default icon per item type — paths point at the neon-relic system's assets.
  * These are only used when a document does not set its own `img`.
  */
@@ -371,32 +388,61 @@ export function transformDocument(doc, { registry = null } = {}) {
       navigation: doc.navigation ?? true,
       navOrder: doc.navOrder ?? 0,
       active: false,
-      initial: doc.initial ?? false,
-      background: {
-        src: doc.background?.src || '',
-        tint: doc.background?.tint || '#ffffff',
-        alpha: doc.background?.alpha ?? 1,
-        scaleX: doc.background?.scaleX ?? 1,
-        scaleY: doc.background?.scaleY ?? 1,
-      },
+      // `initial` is the initial VIEW ({x, y, scale}) — not a boolean flag.
+      initial:
+        typeof doc.initial === 'object' && doc.initial !== null
+          ? doc.initial
+          : { x: null, y: null, scale: null },
       width: doc.width || 1920,
       height: doc.height || 1080,
       padding: doc.padding ?? 0,
       thumb: doc.thumb || doc.background?.src || '',
-      globalLight: doc.globalLight ?? true,
-      darkness: doc.darkness ?? 0,
-      darknessLevel: doc.darknessLevel ?? doc.darkness ?? 0,
       tokenVision: doc.tokenVision ?? false,
       grid: { type: doc.grid?.type ?? 0, size: doc.grid?.size ?? 100 },
       flags: doc.flags || {},
       folder: doc.folder || null,
       sort: doc.sort || 0,
       ownership: doc.ownership || { default: 0 },
-      _stats: doc._stats || {},
+      _stats: { coreVersion: SCENE_SCHEMA_CORE_VERSION, ...(doc._stats || {}) },
     };
     if (doc.fog) scene.fog = doc.fog;
     if (doc.environment) scene.environment = doc.environment;
-    return [{ key: `!scenes!${id}`, data: scene }];
+
+    // Foundry v14 stores the background texture on an embedded Level document,
+    // serialized as its own LevelDB entry (`!scenes.levels!<sceneId>.<levelId>`).
+    // The parent keeps only the id list; the first level is the initial view.
+    //
+    // Legacy top-level `background` / `globalLight` / `darkness` MUST NOT be
+    // emitted (see SCENE_SCHEMA_CORE_VERSION above): with them present, Foundry's
+    // v14.353 `migrateLevels` rebuilds `levels` from `background` and the
+    // authored Level — the artwork — is thrown away.
+    const levelId = toFoundryId(`${doc._id}-level`);
+    /** @type {object} */
+    const level = {
+      _id: levelId,
+      name: 'Background',
+      sort: 0,
+      elevation: { bottom: 0, top: 100 },
+      background: { src: doc.background?.src || '' },
+    };
+    if (doc.background?.tint) level.background.tint = doc.background.tint;
+    if (doc.background?.color) level.background.color = doc.background.color;
+    if (doc.background?.alphaThreshold !== undefined) {
+      level.background.alphaThreshold = doc.background.alphaThreshold;
+    }
+    // Per-image placement controls live under the Level's `textures` block.
+    const textures = {};
+    for (const key of ['scaleX', 'scaleY', 'anchorX', 'anchorY', 'offsetX', 'offsetY', 'fit', 'rotation']) {
+      if (doc.background?.[key] !== undefined) textures[key] = doc.background[key];
+    }
+    if (Object.keys(textures).length) level.textures = textures;
+
+    scene.levels = [levelId];
+
+    return [
+      { key: `!scenes!${id}`, data: scene },
+      { key: `!scenes.levels!${id}.${levelId}`, data: level },
+    ];
   }
 
   return null;

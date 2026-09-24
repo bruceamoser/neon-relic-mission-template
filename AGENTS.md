@@ -13,6 +13,7 @@ template**. This repo builds a Foundry VTT v14 content module (a mission "case f
 | `npm run validate` | Schema + cross-reference validation of pack sources |
 | `npm run validate:self-test` | Prove the validator catches bad input (fixtures) |
 | `npm run audit` | Post-build audit: manifest ↔ dist ↔ source parity, key formats, cross-links |
+| `npm run scenes:verify` | Scene art guard: v14 Level entries, `background.src`, migration stamp, files in `dist/` |
 | `npm run emit:uuids` | Print the slug → compendium UUID map (debugging links) |
 | `./tools/push-local.sh [--link] [--no-build]` | Build + deploy to a local Foundry `Data/modules/` |
 
@@ -55,6 +56,25 @@ descriptions** — and keep spoilers in `daNotes` / DA documents.
 - `dist/` packs are LevelDB; they must be built with `npm run build` (which compacts the database —
   hand-made edits cause phantom entries).
 - Journal pages and table results compile to separate entries automatically — author nested.
+- **Scenes compile to two entries**: `!scenes!<id>` plus `!scenes.levels!<id>.<levelId>` (v14 stores
+  the background texture on the embedded Level). Author only `background.src` (+ optional
+  `tint`/`color`/`alphaThreshold`/texture controls); never author `levels`, `initialLevel`,
+  `globalLight`, `darkness` or `darknessLevel` — the validator rejects those. `pack-lib.mjs` stamps
+  `_stats.coreVersion` (`SCENE_SCHEMA_CORE_VERSION = '14.353'`); without that stamp Foundry's
+  `migrateLevels` migration rebuilds `levels` from the legacy top-level `background` and the scene
+  imports **blank (black square) with no error**. `npm run scenes:verify` is the guard — run it after
+  `npm run build`.
+- **Activating a scene is the reveal** in v14: every connected client is switched to it. `navigation`
+  and scene `ownership` only affect the players' own scene list, so they are never required to show
+  art to players.
+- **Rebuilding packs while Foundry is running serves stale data**: the server holds the pack LevelDB
+  open, so new content (including re-imported scene art) appears only after Foundry restarts. When a
+  world is launched, Foundry also **writes pack migrations back into `dist/packs`** (log:
+  "Migrated record … of database <pack>") — rebuild before zipping a release.
+- The Content Installer preserves world scene reveal state (`active`/`navigation`/`ownership`),
+  remaps the pack Level onto the world's Level id, and reports `N scenes repaired` when healing
+  scenes imported by older builds. Other documents are still overwritten wholesale (playtest state
+  on them is reset).
 - Foundry discovers new modules only at server start; content changes in the **world** require the
   Content Installer to re-run.
 - The module is system-locked to `neon-relic` (manifest `relationships.systems` + runtime guard in

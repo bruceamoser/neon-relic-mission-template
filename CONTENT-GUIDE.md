@@ -31,11 +31,11 @@ document types map onto that structure:
 | Relics & kit | `artifact`, `weapon`, `gear`, … | items | **Players** (item descriptions) / DA | The relic at the heart of the case and the equipment around it |
 | Journals | `journalEntry` | journals | Either | Handouts (player) and run sheets / walkthroughs (DA) |
 | Tables | `rollTable` | tables | DA | Complications, fractures, random flavour |
-| Landing scene | `scene` | scenes | Both | The module's splash page / title card |
+| Scenes | `scene` | scenes | Both | Landing splash page, theater-of-the-mind views, gridless battle maps |
 
 Scale reference (Mission: Sangreal): 61 information cards (45 evidence + 16 cast), 16 NPCs,
 7 locations, 2 factions, 10 relic/equipment items, 4 journals including a day-by-day DA walkthrough,
-1 landing scene.
+and 27 scenes (landing page + 16 theater-of-the-mind views + 10 gridless battle maps).
 
 ---
 
@@ -262,18 +262,77 @@ Example: `example-journals.yaml` (both patterns).
 
 Example: `example-tables.yaml`.
 
-### 3.13 `scene` — the landing page
+### 3.13 `scene` — landing page and scene art
 
-A module splash scene. Flag it so the Content Installer activates it when the world has no active
-  scene:
+Scenes are how the module puts artwork on the players' screen: a landing splash page,
+  theater-of-the-mind views, and gridless battle maps. Author the image with `background.src`;
+  the build compiles it onto a Foundry v14 **Level** document and stamps the schema version, so the
+  art survives import (see §3.13.1).
 
 ```yaml
-flags:
-  <your-module-id>:
-    landingPage: true
+- _id: my-scene-atmosphere
+  name: 'EX1 — Atmosphere view'
+  type: scene
+  navName: 'EX1'
+  navigation: false
+  background:
+    src: modules/<your-module-id>/assets/scenes/ex1.webp
+  width: 1672
+  height: 941
+  padding: 0
+  tokenVision: false
+  grid:
+    type: 0 # 0 = gridless
+    size: 100
+  flags:
+    <your-module-id>:
+      sceneArtId: EX1
+      sceneKind: totm
+      reveal: 'First scene of Act One'
 ```
 
-Example: `example-scenes.yaml`.
+The `flags` block is free-form — `sceneArtId` / `sceneKind` / `reveal` are a catalogue convention
+  (Sangreal uses them to drive its “Scene Art — GM Index” journal page). Flag the landing scene so
+  the Content Installer activates it when the world has no active scene:
+
+```yaml
+  flags:
+    <your-module-id>:
+      landingPage: true
+```
+
+Example: `example-scenes.yaml` (landing page + one atmosphere scene).
+
+#### 3.13.1 How scene art is stored — and what breaks it
+
+- Foundry v14 keeps a scene's background on an embedded **Level** document, serialized as its own
+  pack entry: `!scenes.levels!<sceneId>.<levelId>`. The scene parent holds `levels: [<levelId>]`.
+- **The build owns that shape.** Never author `levels`, `initialLevel`, `globalLight`, `darkness` or
+  `darknessLevel` — the validator rejects them. Authoring a legacy top-level `background` makes
+  Foundry's `migrateLevels` migration rebuild `levels` from it on import, discarding the authored
+  Level: the scene imports as an empty black square and nothing errors.
+- `tools/lib/pack-lib.mjs` stamps `_stats.coreVersion` (`SCENE_SCHEMA_CORE_VERSION = '14.353'`) on
+  every scene document. That stamp is the migration gate — without it Foundry treats the record as
+  ancient and rewrites it. **Do not remove it.**
+- `background.tint`, `background.color`, `background.alphaThreshold` and the legacy per-image
+  controls (`scaleX`, `scaleY`, `anchorX`, `anchorY`, `offsetX`, `offsetY`, `fit`, `rotation`) are
+  compiled onto the Level correctly (`textures` block) — author them as before.
+- Guard rail: `npm run scenes:verify` (run it after `npm run build`) proves every scene has a Level,
+  a background `src`, the schema stamp, and that the referenced file exists inside `dist/`.
+- Art budget: export WebP at q82–85 (≈190 KB per megapixel; Sangreal's 26 backgrounds total
+  6.55 MB). Only `src/assets/**` ships — keep masters out of the repo by listing their folder in
+  `art/.gitignore`, which already covers `scene-production/masters/`.
+
+#### 3.13.2 Revealing scenes at the table
+
+- **Activating a scene IS the reveal.** Foundry switches every connected client to it — no
+  ownership, permission or Accessibility change is involved.
+- `navigation` and `ownership` (Accessibility → All Players) only control whether players can also
+  re-open the scene themselves from their own scene list. Author scenes inactive with
+  `navigation: false` (the defaults) and reveal deliberately at the beat that calls for the art.
+- Re-running the Content Installer does not undo reveal state: the installer preserves each world
+  scene's `active` / `navigation` / `ownership`, remaps the pack Level onto the world's Level id
+  (no duplicates), and repairs scenes imported by older builds — reporting `N scenes repaired`.
 
 ---
 
@@ -334,6 +393,31 @@ The four-part format (§3.5) exists so the DA never has to reconstruct intent: w
 proves, what the image hides, and how to deploy it. When in doubt on a player-facing choice, move
 the detail to the DA side — nothing is lost, it just moves.
 
+### 4.5 Pack exposure — lock the compendium to the GM
+
+Foundry's default compendium ownership is `{"PLAYER": "OBSERVER", "ASSISTANT": "OWNER"}`, which
+lets players browse every pack in your module from their sidebar — DA briefs, walkthroughs, NPC
+sheets and all. Mission content is spoiler-heavy, so the template ships every pack locked to the
+GM:
+
+```json
+{
+  "name": "example-clues",
+  "label": "Information Cards",
+  "path": "packs/example-clues",
+  "type": "Item",
+  "system": "neon-relic",
+  "ownership": { "ASSISTANT": "OWNER", "PLAYER": "NONE" }
+}
+```
+
+Keep that block on every pack. `npm run audit` prints a note listing any pack you leave unlocked, so
+the choice stays deliberate. Players still receive everything they should — the world copies you
+create with the Content Installer (handouts, revealed information cards, activated scenes) are gated
+by world document ownership, not by pack ownership. Caveat: this controls UI exposure only; a
+determined player with console access can still read pack documents, because core v14 does not
+gate `pack.getDocument()` on ownership.
+
 ---
 
 ## 5. Pre-release QA checklist
@@ -343,6 +427,8 @@ Run the automated gates, then walk the human checklist:
 - [ ] `npm run build` — compiles cleanly
 - [ ] `npm run validate` — schema + cross-reference checks pass
 - [ ] `npm run audit` — manifest ↔ build parity, links intact
+- [ ] `npm run scenes:verify` — every scene has a v14 Level, a background file, and the migration stamp
+- [ ] Every pack locked to the GM (`"PLAYER": "NONE"`) or unlocked on purpose (§4.5)
 - [ ] Every player-visible surface read once **as a player**: can anything be spoiled by it?
 - [ ] Cast cards checked against §4.2 (no photograph descriptions)
 - [ ] DA brief Section IV containment truths match the artifact item's containment profile

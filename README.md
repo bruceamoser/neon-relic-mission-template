@@ -19,8 +19,10 @@ for every document type a mission uses, the complete build/test/release tooling,
 | Bundle | Contents |
 | --- | --- |
 | **Build pipeline** | `src/packs/*.yaml` → Foundry v14 LevelDB compendium packs + static copy → `dist/` |
-| **Quality gates** | `npm run validate` (schema checks) and `npm run audit` (manifest ↔ build parity, key formats, cross-link integrity) |
-| **Content installer** | A module settings menu that imports all packs into a world with per-pack folders, overwrite-by-id updates, and automatic landing-scene activation |
+| **Quality gates** | `npm run validate` (schema checks), `npm run audit` (manifest ↔ build parity, key formats, cross-link integrity) and `npm run scenes:verify` (scene Levels, art files, migration stamp) |
+| **Content installer** | A module settings menu that imports all packs into a world with per-pack folders, overwrite-by-id updates, automatic landing-scene activation, and scene-art repair on older imports |
+| **Scene art ready** | Landing splash page + theater-of-the-mind/battle-map scenes authored as YAML and compiled onto Foundry v14 **Level** documents, so artwork survives import |
+| **Spoiler lock** | All packs ship GM-only (`"ownership": { "PLAYER": "NONE" }`) so players cannot browse DA briefs or walkthroughs from their sidebar — world copies you reveal still reach them |
 | **System guard** | The module is inert outside the **neon-relic** system and warns the GM if wrongly enabled |
 | **Local testing** | `tools/push-local.sh` — build and deploy to a local Foundry install (rsync or symlink mode) |
 | **Release automation** | `.github/workflows/release.yml` + the `create-release` skill: versioned GitHub releases with the module zip and manifest attached |
@@ -72,9 +74,10 @@ Everything else (build, audit, installer folders, release workflow) derives the 
 
 ```bash
 npm install
-npm run build      # compiles src/packs/*.yaml + static/ + src/assets/ → dist/
-npm run validate   # schema + cross-reference checks on your YAML
-npm run audit      # manifest ↔ build parity, LevelDB key formats, link integrity
+npm run build        # compiles src/packs/*.yaml + static/ + src/assets/ → dist/
+npm run validate     # schema + cross-reference checks on your YAML
+npm run audit        # manifest ↔ build parity, LevelDB key formats, link integrity
+npm run scenes:verify # scene Levels, background files, migration stamp
 ```
 
 ### 4. Test locally in Foundry (optional — needs a local install)
@@ -165,8 +168,49 @@ Other useful commands:
 | Command | What it does |
 | --- | --- |
 | `npm run clean` | Remove `dist/` |
+| `npm run scenes:verify` | Prove scene art is import-safe (v14 Levels, migration stamp, files present) |
 | `npm run emit:uuids` | Print every document's slug → compendium UUID (for debugging links) |
-| `npm run validate:self-test` | Prove the validator still catches bad input (5 fixtures) |
+| `npm run validate:self-test` | Prove the validator still catches bad input (7 fixtures) |
+
+---
+
+## Scene art
+
+Scenes are how your module puts art on the players' screen. You author one YAML document; the build
+compiles the image onto a Foundry v14 **Level** (the place v14 actually stores a scene background)
+and stamps `_stats.coreVersion` so Foundry's migrations leave it alone:
+
+```yaml
+- _id: my-scene-ex1
+  name: 'EX1 — Atmosphere view'
+  type: scene
+  navName: 'EX1'
+  navigation: false          # keep out of the players' scene list
+  background:
+    src: modules/<your-module-id>/assets/scenes/ex1.webp
+  width: 1672
+  height: 941
+  grid: { type: 0, size: 100 }  # gridless
+  flags:
+    <your-module-id>:
+      sceneArtId: EX1
+```
+
+Rules that keep art from disappearing:
+
+- **Never** author `levels`, `initialLevel`, `globalLight`, `darkness` or `darknessLevel` — the
+  validator rejects them. A legacy top-level `background` makes Foundry rebuild the Level on import
+  and the scene imports as a blank black square, silently.
+- Export WebP at q82–85 and keep masters **out of the repo** (only `src/assets/**` ships; add master
+  folders to `art/.gitignore`, which already ignores `scene-production/masters/`).
+- Run `npm run scenes:verify` after every build — it is the guard that the stamp, the Level and the
+  image file all survived.
+
+Revealing at the table: **activating a scene is the reveal** — every connected player is switched to
+it, no permission or Accessibility change needed. `navigation` / Accessibility only control whether
+players can re-open the scene themselves from their own scene list. Re-running the Content Installer
+never undoes this: it preserves each world scene's `active` / `navigation` / `ownership` and reports
+`N scenes repaired` when it restores art on scenes imported by older builds.
 
 ---
 
@@ -196,7 +240,13 @@ If you have Foundry installed on this machine:
 
 5. **Iterate** — `npm run build` → F5 → re-run the Content Installer (it overwrites by id; no
    duplicates). Note the installer replaces world copies of documents, which **resets playtest
-   state** stored on them (board day markers, checkboxes).
+   state** stored on them (board day markers, checkboxes) — scene reveal state
+   (`active` / `navigation` / `ownership`) is preserved instead, and art-less scenes from older
+   builds are repaired.
+
+> Rebuilding `dist/packs` while Foundry is running serves **stale pack data** (the server keeps the
+> LevelDB files open): quit and relaunch Foundry before verifying content changes, then re-run the
+> Content Installer.
 
 > `npm run build && npm run validate && npm run audit` passing is the same gate CI enforces —
 > you can develop confidently without a local Foundry.
@@ -230,6 +280,8 @@ Then enable in a world and run the Content Installer.
 | World still shows old content after a build | The compendium reflects disk immediately, but **world copies** update only via the Content Installer. |
 | `unresolved slug "..."` build error | A `*Slugs` cross-reference names a `_id` that doesn't exist (yet). Fix the slug or create the document. |
 | Cards/journal show phantom empty pages | You hand-edited `dist/` or skipped `compactRange` — always rebuild with `npm run build`. |
+| Imported scene is an **empty black square** | The pack scene lost its v14 Level — usually a record without `_stats.coreVersion`, or a legacy top-level `background` making `migrateLevels` rebuild it. Rebuild with `npm run build` (the compiler stamps the gate), restart Foundry, re-run the Content Installer: it repairs existing world scenes and reports `N scenes repaired`. |
+| Scene art missing for players, GM sees it | They are looking at the canvas of a different scene: activating a scene pulls every client to it. Accessibility/`navigation` only add it to their own scene list. |
 | Module warns "requires neon-relic" in another system world | Working as intended: the module is system-locked (manifest `relationships.systems` + runtime guard). |
 | Foundry lists the module but won't enable it | The world's neon-relic system version is below the `compatibility.minimum` in `static/module.json`. |
 

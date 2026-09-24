@@ -10,6 +10,10 @@
  *      per-module folder tree, overwriting by document id on re-run.
  *   3. Landing scene activation: a scene flagged `landingPage` is activated
  *      automatically when the world has no active scene.
+ *   4. Scene-art repair: re-running the installer keeps each world scene's
+ *      reveal state (active/navigation/ownership) and restores the Level
+ *      background on scenes imported by builds that stored the art on the
+ *      legacy top-level `background` field — those scenes showed up blank.
  *
  * Rename checklist when adapting this template:
  *   - change MODULE_ID below to match the `id` in static/module.json
@@ -77,6 +81,50 @@ function buildInstallPlan() {
 }
 
 /**
+ * Reconcile an incoming pack Scene with the world copy it is about to
+ * overwrite.
+ *
+ * Scenes hold player-facing state the pack knows nothing about, so the update
+ * is filtered to what the pack actually owns:
+ *   - `active` / `navigation` / `ownership` are world reveal state → dropped.
+ *   - The pack authors exactly one background Level; it is remapped onto the
+ *     world scene's existing Level id, so re-running the installer never
+ *     duplicates Levels (and heals legacy `defaultLevel0000` imports).
+ *
+ * Also heals scenes imported by an older build: when neither the pack Level nor
+ * the world Level carries a background source, the scene thumbnail is used and
+ * the repair is counted.
+ * @param {Scene} existing - The world scene being updated.
+ * @param {object} data - Incoming pack document data.
+ * @param {{repaired: number}} stats - Repair counter, reported in the summary.
+ * @returns {object} The filtered update data.
+ */
+function prepareSceneUpdate(existing, data, stats) {
+  const update = data;
+  if (existing.active) delete update.active;
+  delete update.navigation;
+  delete update.ownership;
+
+  const worldLevels = existing.levels?.contents ?? [];
+  const packLevels = Array.isArray(update.levels) ? update.levels : [];
+  const packLevel = packLevels.length === 1 ? packLevels[0] : null;
+  if (!packLevel) return update;
+
+  if (!packLevel.background?.src && typeof update.thumb === 'string' && update.thumb.includes(MODULE_ID)) {
+    packLevel.background = { ...packLevel.background, src: update.thumb };
+  }
+
+  const initialLevel = existing.initialLevel;
+  const levelId = initialLevel?.id ?? worldLevels[0]?.id;
+  if (levelId) {
+    if (!initialLevel?.background?.src) stats.repaired++;
+    update.levels = [{ ...packLevel, _id: levelId }];
+    update.initialLevel = levelId;
+  }
+  return update;
+}
+
+/**
  * Import or refresh every module pack into the world.
  *
  * World documents whose IDs match a pack document are UPDATED in place, so
@@ -104,6 +152,7 @@ async function installContent() {
   let created = 0;
   let updated = 0;
   let failed = 0;
+  const sceneStats = { repaired: 0 };
 
   for (const { pack: packName, type, label, folder: subfolderName } of plan) {
     const pack = game.packs.get(`${MODULE_ID}.${packName}`);
@@ -139,7 +188,8 @@ async function installContent() {
         if (existing) {
           // Overwrite in place, keeping the pack ID and any world-side
           // additions the update does not touch (diff: false = no deletions).
-          await existing.update(data, { diff: false });
+          const update = doc.documentName === 'Scene' ? prepareSceneUpdate(existing, data, sceneStats) : data;
+          await existing.update(update, { diff: false });
           updated++;
         } else {
           await doc.constructor.create(data, { keepId: true });
@@ -166,8 +216,8 @@ async function installContent() {
 
   notification?.remove?.();
   const summary = `${rootFolderName()} — content ready (${created} new, ${updated} updated${
-    failed ? `, ${failed} failed` : ''
-  }).`;
+    sceneStats.repaired ? `, ${sceneStats.repaired} scenes repaired` : ''
+  }${failed ? `, ${failed} failed` : ''}).`;
   console.log(`${MODULE_ID} | installer: ${summary}`);
   if (failed) {
     ui.notifications.error(`${failed} document(s) failed to install — see the console for details.`);

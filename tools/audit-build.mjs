@@ -16,7 +16,9 @@
  *      table results) match the source counts.
  *   4. LevelDB key formats match the Foundry v14 layout
  *      (!items!, !actors!, !journal!, !journal.pages!, !tables!,
- *       !tables.results!, !macros!, !scenes!).
+ *       !tables.results!, !macros!, !scenes!, !scenes.levels!), every scene
+ *      document carries the modern Level shape + schema stamp, and the legacy
+ *      top-level background/globalLight/darkness keys are absent.
  *   5. No unresolved authoring slug fields (`*Slugs`) leaked into the build,
  *      and every cross-reference UUID points back at this module.
  *
@@ -99,6 +101,18 @@ async function audit() {
     notes.push(`pack sync: ${declaredPaths.length} declared packs all present`);
   }
 
+  // Compendium spoiler lock: mission packs default to GM-only so players cannot
+  // browse DA briefs, walkthroughs and NPC sheets from their sidebar.
+  const packs = manifest.packs ?? [];
+  const unlocked = packs.filter((p) => p.ownership?.PLAYER !== 'NONE');
+  if (unlocked.length) {
+    notes.push(
+      `packs not locked to GM: ${unlocked.map((p) => p.name).join(', ')} — players can browse these packs (see CONTENT-GUIDE §4.5)`,
+    );
+  } else if (packs.length) {
+    notes.push(`pack ownership: all ${packs.length} packs locked to GM (PLAYER: NONE)`);
+  }
+
   // ── 3. Source ↔ compiled parity ─────────────────────────
   const sourcePacks = await loadSourcePacks();
   const declaredNames = new Set((manifest.packs ?? []).map((p) => p.name));
@@ -128,16 +142,35 @@ async function audit() {
       0,
     );
     const expectedResults = documents.reduce((n, d) => n + (d.type === 'rollTable' ? d.system?.entries?.length ?? 0 : 0), 0);
+    const expectedLevels = documents.reduce(
+      (n, d) => n + (d.type === 'scene' || d.type === 'Scene' ? 1 : 0),
+      0,
+    );
     const pageEntries = keys.filter((k) => k.startsWith('!journal.pages!')).length;
     const resultEntries = keys.filter((k) => k.startsWith('!tables.results!')).length;
+    const levelEntries = keys.filter((k) => k.startsWith('!scenes.levels!')).length;
     if (pageEntries !== expectedPages) errors.push(`${packName}: expected ${expectedPages} journal pages, found ${pageEntries}`);
     else if (expectedPages) notes.push(`${packName}: ${pageEntries} journal pages`);
     if (resultEntries !== expectedResults) errors.push(`${packName}: expected ${expectedResults} table results, found ${resultEntries}`);
     else if (expectedResults) notes.push(`${packName}: ${resultEntries} table results`);
+    if (levelEntries !== expectedLevels) errors.push(`${packName}: expected ${expectedLevels} scene levels, found ${levelEntries}`);
+    else if (expectedLevels) notes.push(`${packName}: ${levelEntries} scene levels`);
+
+    // Scene documents must carry the modern v14 shape: background on an
+    // embedded Level, no legacy top-level background/globalLight/darkness,
+    // and the schema stamp that stops Foundry rebuilding the Level.
+    for (const [key, value] of entries) {
+      if (!key.startsWith('!scenes!')) continue;
+      for (const legacy of ['background', 'globalLight', 'darkness', 'darknessLevel']) {
+        if (value[legacy] !== undefined) errors.push(`${key}: legacy top-level "${legacy}" must not ship (breaks v14 Level backgrounds)`);
+      }
+      if (!Array.isArray(value.levels) || value.levels.length === 0) errors.push(`${key}: missing levels[]`);
+      if (!value._stats?.coreVersion) errors.push(`${key}: missing _stats.coreVersion schema stamp`);
+    }
 
     // ── 4. Key formats ────────────────────────────────────
     for (const key of keys) {
-      const ok = /^!(items|actors|journal|journal\.pages|tables|tables\.results|macros|scenes)!/u.test(key);
+      const ok = /^!(items|actors|journal|journal\.pages|tables|tables\.results|macros|scenes|scenes\.levels)!/u.test(key);
       if (!ok) errors.push(`${packName}: unexpected key format "${key}"`);
     }
 

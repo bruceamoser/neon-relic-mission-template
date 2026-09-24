@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1672" height="941" viewBox="0 0 1672 941">
+  <rect width="1672" height="941" fill="#14181c"/>
+  <rect x="24" y="24" width="1624" height="893" fill="none" stroke="#3d4a52" stroke-width="2"/>
+  <g stroke="#222a30" stroke-width="1">
+    <path d="M0 235.25h1672M0 470.5h1672M0 705.75h1672"/>
+    <path d="M418 0v941M836 0v941M1254 0v941"/>
+  </g>
+  <text x="836" y="455" font-family="Courier New, monospace" font-size="54" fill="#7f8c94" text-anchor="middle" letter-spacing="6">SCENE ART PLACEHOLDER</text>
+  <text x="836" y="512" font-family="Courier New, monospace" font-size="26" fill="#55636b" text-anchor="middle" letter-spacing="3">replace with your artwork — 1672 x 941 (16:9)</text>
+  <text x="836" y="872" font-family="Courier New, monospace" font-size="20" fill="#3d4a52" text-anchor="middle">example-scene-totm.svg — ships with the Neon Relic mission template</text>
+</svg>

@@ -214,6 +214,21 @@ function validateDocument(doc, errors) {
     checkImageRef(doc.background?.src, `${label}: background`, errors, { optional: false });
     if (doc.width !== undefined && !isInt(doc.width)) errors.push(`${label}: scene.width must be an integer`);
     if (doc.height !== undefined && !isInt(doc.height)) errors.push(`${label}: scene.height must be an integer`);
+    if (doc.grid?.type !== undefined && !isInt(doc.grid.type)) errors.push(`${label}: scene.grid.type must be an integer`);
+    if (doc.grid?.size !== undefined && !isInt(doc.grid.size)) errors.push(`${label}: scene.grid.size must be an integer`);
+    if (doc.initial !== undefined && (typeof doc.initial !== 'object' || doc.initial === null)) {
+      errors.push(`${label}: scene.initial must be an object ({x, y, scale}) — it is the initial view, not a boolean flag`);
+    }
+    // Compiled shapes belong to the build: v14 stores the background on an
+    // embedded Level, and authoring the legacy top-level keys makes Foundry's
+    // migrateLevels migration discard that Level (scene imports blank).
+    for (const reserved of ['levels', 'initialLevel', 'globalLight', 'darkness', 'darknessLevel']) {
+      if (doc[reserved] !== undefined) {
+        errors.push(
+          `${label}: scene.${reserved} must not be authored — author background.src instead; the build compiles it onto a v14 Level`,
+        );
+      }
+    }
     return;
   }
 
@@ -346,6 +361,29 @@ function runSelfTest() {
         },
       ],
       expect: /artifactDie/,
+    },
+    {
+      name: 'legacy scene level keys',
+      packs: [
+        {
+          file: 'fixture.yaml',
+          documents: [
+            {
+              _id: 'x4',
+              name: 'S',
+              type: 'scene',
+              background: { src: 'modules/neon-relic-mission-template/assets/examples/example-landing.svg' },
+              globalLight: true,
+            },
+          ],
+        },
+      ],
+      expect: /must not be authored/,
+    },
+    {
+      name: 'scene without background',
+      packs: [{ file: 'fixture.yaml', documents: [{ _id: 'x5', name: 'S', type: 'scene' }] }],
+      expect: /background/,
     },
   ];
 

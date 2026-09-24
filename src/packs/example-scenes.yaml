@@ -1,25 +1,36 @@
 # Example Mission — Scenes (Scene pack)
 # Scenes: scene
 #
-# The module landing scene: a splash page the Content Installer imports and
-# activates automatically when the world has no active scene. The
-# `landingPage` flag (namespaced to YOUR module id — remember to rename it
-# when you rename the module) tells scripts/main.mjs which scene to activate.
+# Two scenes: the module landing page (imported and activated automatically when
+# the world has no active scene) and one atmosphere scene showing the art
+# pattern. Rename the `landingPage` flag namespace to YOUR module id.
+#
+# HOW SCENE ART IS STORED (Foundry v14)
+#   A scene's background texture lives on an embedded Level document, not on the
+#   scene. Author it with the familiar `background.src` key — the build compiles
+#   that into a separate `!scenes.levels!<sceneId>.<levelId>` entry and stamps
+#   `_stats.coreVersion` (see SCENE_SCHEMA_CORE_VERSION in tools/lib/pack-lib.mjs).
+#   Never author `levels`, `initialLevel`, `globalLight`, `darkness` or
+#   `darknessLevel`: legacy top-level `background`/`globalLight`/`darkness` makes
+#   Foundry rebuild the Level on import and the scene comes in blank.
+#
+# HOW REVEALING A SCENE WORKS (v14)
+#   Activating a scene switches every connected client to it — that IS the
+#   reveal, no permission change required. `navigation` and `ownership` only
+#   control whether players can also find the scene in their own scene list, so
+#   author new scenes inactive with `navigation: false` (the defaults below) and
+#   reveal them deliberately at the point the mission calls for them.
 ---
-
 - _id: example-scene-landing
   name: 'Example Mission — Landing Page'
   type: scene
   navName: 'Example'
   navigation: true
-  initial: true
   background:
     src: modules/neon-relic-mission-template/assets/examples/example-landing.svg
   width: 1672
   height: 941
   padding: 0
-  globalLight: true
-  darkness: 0
   tokenVision: false
   grid:
     type: 0
@@ -27,3 +38,28 @@
   flags:
     neon-relic-mission-template:
       landingPage: true
+      sceneKind: landing
+
+# Atmosphere / battle-map scenes. Keep `sceneArtId`, `sceneKind` and `reveal`
+# whatever you like — the flags are just a catalogue so a GM index page (or the
+# DA walkthrough) can point at the right art at the right beat.
+- _id: example-scene-atmosphere
+  name: 'EX1 — Atmosphere view (example)'
+  type: scene
+  navName: 'EX1'
+  navigation: false
+  background:
+    src: modules/neon-relic-mission-template/assets/examples/example-scene-totm.svg
+  width: 1672
+  height: 941
+  padding: 0
+  tokenVision: false
+  grid:
+    type: 0 # 0 = gridless (best for theater-of-the-mind views, and maps run without tokens)
+    size: 100
+  flags:
+    neon-relic-mission-template:
+      sceneArtId: EX1
+      sceneKind: totm
+      reveal: 'First scene of Act One'
+      artApproved: false

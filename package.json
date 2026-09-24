@@ -19,6 +19,7 @@
     "validate": "node tools/validate-packs.mjs",
     "validate:self-test": "node tools/validate-packs.mjs --self-test",
     "audit": "node tools/audit-build.mjs",
+    "scenes:verify": "node tools/verify-scenes.mjs",
     "emit:uuids": "node tools/emit-uuids.mjs"
   },
   "devDependencies": {
