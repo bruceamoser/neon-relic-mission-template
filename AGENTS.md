@@ -90,6 +90,11 @@ descriptions** — and keep spoilers in `daNotes` / DA documents.
   CC0, CC-BY (credited in a shipped `CREDITS.md`), or ffmpeg-synthesized originals. Do NOT bundle
   Mixkit/Pixabay/other stock-library files: their licences forbid standalone redistribution, which
   is exactly what a module zip is.
+- **Journal HTML can embed audio**: the sanitizer allowlist includes `audio` with
+  `controls|loop|muted|src|autoplay` (and `style` globally), so `<audio controls src="modules/<id>/assets/…">`
+  renders a working player in a journal page; relative paths need no scheme. Inline players are
+  per-client (a DA cue) — the playlist is the synchronised, shared route. The audit checks playlist
+  sound paths, not embedded players, so keep them in step with the sound `path` values.
 - **Journal page ids are position-based** (`<journalId>pNNN`): only ever APPEND pages. Inserting one
   mid-journal renumbers the rest and breaks stored page UUID links (e.g. scene `journalEntryPage`).
 - The module is system-locked to `neon-relic` (manifest `relationships.systems` + runtime guard in

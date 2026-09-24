@@ -385,6 +385,27 @@ Rules that matter:
 
 Example: `example-sfx.yaml` (one bed + one sting; both sounds are ffmpeg-synthesized originals).
 
+#### 3.14.1 Make the cues playable
+
+Journal HTML may embed audio directly — Foundry's sanitizer allows the `audio` tag with `controls`, `loop`, `muted`, `src`
+  and `autoplay` (checked against `ALLOWED_HTML_TAGS` / `ALLOWED_HTML_ATTRIBUTES` in the v14 client bundle), and a
+  relative `modules/<your-module-id>/assets/...` path needs no URL scheme. So a walkthrough beat can carry a real play
+  button instead of a track name:
+
+```html
+<p>Play the lift on the way (play <audio controls preload="none" style="height:1.7em;vertical-align:middle"
+  src="modules/<your-module-id>/assets/audio/sfx-lift.mp3"></audio> <em>Vault lift descent</em>).</p>
+```
+
+- Inline players play in the reader's own client — right for a DA cue. Shared playback is the playlist's job (each
+  client hears it synchronised), so say which is which on the page: one player at the beat, playlist for the table.
+- Keep `preload="none"` so opening the journal does not pull every track; `style` is allowed globally, which is enough
+  to size the strip inline.
+- The audit's playlist check covers files that ship; embedded player paths are **not** checked — keep them in step with
+  the sound `path` values, and prefer copying the same string.
+
+Example: Sangreal's DA Walkthrough (9 inline players at its sound cues + a 25-track cue sheet).
+
 ---
 
 ## 4. Content policy — player-facing vs DA-only
