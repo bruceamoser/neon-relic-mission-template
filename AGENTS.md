@@ -77,5 +77,16 @@ descriptions** — and keep spoilers in `daNotes` / DA documents.
   on them is reset).
 - Foundry discovers new modules only at server start; content changes in the **world** require the
   Content Installer to re-run.
+- **Playlists compile to two entry kinds**: `!playlists!<id>` plus one
+  `!playlists.sounds!<id>.<soundId>` per sound (v14 stores sounds separately, like journal pages).
+  Never author `seed` (non-nullable integer — `seed: null` fails validation) or `channel` (required,
+  but Foundry fills `music`). Sound files must live under `src/assets/**`; the audit fails if a
+  sound `path` is missing from `dist/`.
+- **Audio licensing is a hard constraint**: only ship audio you may redistribute — public domain,
+  CC0, CC-BY (credited in a shipped `CREDITS.md`), or ffmpeg-synthesized originals. Do NOT bundle
+  Mixkit/Pixabay/other stock-library files: their licences forbid standalone redistribution, which
+  is exactly what a module zip is.
+- **Journal page ids are position-based** (`<journalId>pNNN`): only ever APPEND pages. Inserting one
+  mid-journal renumbers the rest and breaks stored page UUID links (e.g. scene `journalEntryPage`).
 - The module is system-locked to `neon-relic` (manifest `relationships.systems` + runtime guard in
   `main.mjs`); do not remove either.

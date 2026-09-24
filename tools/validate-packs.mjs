@@ -73,17 +73,20 @@ const isInt = (v) => Number.isInteger(v);
  * @param {string[]} errors
  * @param {{optional?: boolean}} [options]
  */
-function checkImageRef(p, label, errors, { optional = true } = {}) {
+function checkAssetRef(p, label, errors, { optional = true } = {}) {
   if (typeof p !== 'string' || p.trim() === '') {
-    if (!optional) errors.push(`${label}: missing image path`);
+    if (!optional) errors.push(`${label}: missing asset path`);
     return;
   }
   if (!p.startsWith(MODULE_ASSET_PREFIX)) return;
   const rel = p.slice(MODULE_ASSET_PREFIX.length);
   if (!fs.existsSync(path.join(SRC_ASSETS, rel))) {
-    errors.push(`${label}: image not found in src/assets → ${rel}`);
+    errors.push(`${label}: asset not found in src/assets → ${rel}`);
   }
 }
+
+/** @deprecated alias kept for the older call sites (images). */
+const checkImageRef = checkAssetRef;
 
 /* ------------------------------------------ */
 /*  Per-document validation                   */
@@ -229,6 +232,37 @@ function validateDocument(doc, errors) {
         );
       }
     }
+    return;
+  }
+
+  // --- Playlists (sound effects) ----------------------------------------
+  if (doc.type === 'playlist' || doc.type === 'Playlist') {
+    if (!Array.isArray(doc.sounds) || doc.sounds.length === 0) {
+      errors.push(`${label}: playlist needs a non-empty "sounds" array`);
+      return;
+    }
+    if (doc.mode !== undefined && ![0, 1, 2].includes(doc.mode)) {
+      errors.push(`${label}: playlist.mode must be 0 (sequential), 1 (simultaneous) or 2 (shuffle)`);
+    }
+    const seen = new Set();
+    doc.sounds.forEach((sound, i) => {
+      const sLabel = `${label}: sounds[${i}]`;
+      if (!sound || typeof sound !== 'object') {
+        errors.push(`${sLabel}: must be an object`);
+        return;
+      }
+      if (typeof sound._id !== 'string' || sound._id.trim() === '') errors.push(`${sLabel}: missing _id (authoring slug)`);
+      else if (seen.has(sound._id)) errors.push(`${sLabel}: duplicate sound _id "${sound._id}"`);
+      else seen.add(sound._id);
+      if (typeof sound.name !== 'string' || sound.name.trim() === '') errors.push(`${sLabel}: missing name`);
+      checkAssetRef(sound.path, `${sLabel} path`, errors, { optional: false });
+      if (sound.volume !== undefined && (typeof sound.volume !== 'number' || sound.volume < 0 || sound.volume > 1)) {
+        errors.push(`${sLabel}: volume must be a number between 0 and 1`);
+      }
+      if (sound.repeat !== undefined && typeof sound.repeat !== 'boolean') {
+        errors.push(`${sLabel}: repeat must be a boolean`);
+      }
+    });
     return;
   }
 
@@ -384,6 +418,23 @@ function runSelfTest() {
       name: 'scene without background',
       packs: [{ file: 'fixture.yaml', documents: [{ _id: 'x5', name: 'S', type: 'scene' }] }],
       expect: /background/,
+    },
+    {
+      name: 'playlist with a broken sound path',
+      packs: [
+        {
+          file: 'fixture.yaml',
+          documents: [
+            {
+              _id: 'x6',
+              name: 'P',
+              type: 'playlist',
+              sounds: [{ _id: 's1', name: 'Bed', path: 'modules/neon-relic-mission-template/assets/examples/missing.mp3' }],
+            },
+          ],
+        },
+      ],
+      expect: /asset not found/,
     },
   ];
 

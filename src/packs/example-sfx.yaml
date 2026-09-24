@@ -1,0 +1,46 @@
+# Example Mission — Sound Effects (Playlist pack)
+# Playlists: playlist
+#
+# One playlist per module. `PLAYLIST.md`-style guidance lives in CONTENT-GUIDE §3.14;
+# the installer imports this pack into a world folder named after the pack label
+# ("Sound Effects"), and the playlist is what the GM plays from the Playlists sidebar.
+#
+# Sound rules of thumb
+#   - Ambience beds: 30–45 s, `repeat: true` (Foundry loops them until stopped).
+#   - Props / stings: 1–8 s, `repeat: false`, fired on the beat.
+#   - `volume` is a 0–1 starting trim (Foundry's default is 0.5): ambience 0.35–0.45,
+#     one-shots 0.5–0.65.
+#   - Put the file under src/assets/** so it ships with the module. The build compiles
+#     each sound to its own `!playlists.sounds!<playlistId>.<soundId>` entry, and
+#     `npm run audit` fails if a sound path does not exist inside dist/.
+#
+# LICENSING (important): only ship audio you may REDISTRIBUTE.
+#   - Safe: public domain, CC0, CC-BY (credit the author), or audio you synthesize
+#     yourself with ffmpeg.
+#   - Avoid: stock libraries whose licence forbids standalone redistribution
+#     (Mixkit, Pixabay, most "free" SFX sites) — a module zip is exactly that.
+#   - Record every third-party file in a CREDITS file that ships inside the module.
+#
+# The two example sounds here are ffmpeg-synthesized originals (no third-party rights).
+---
+- _id: example-sfx
+  name: Example Sound Effects
+  type: playlist
+  description: 'Two example cues: a looping ambience bed and a one-shot sting. Replace both, then map each track to the beat that calls for it in your DA walkthrough.'
+  mode: 0
+  playing: false
+  fade: 2000
+  sorting: 'a'
+  sounds:
+    - _id: example-sfx-bed
+      name: 'Ambience — Example bed (loop)'
+      path: modules/neon-relic-mission-template/assets/examples/example-ambience.mp3
+      repeat: true
+      volume: 0.4
+      playing: false
+    - _id: example-sfx-sting
+      name: 'Sting — Example one-shot'
+      path: modules/neon-relic-mission-template/assets/examples/example-sting.mp3
+      repeat: false
+      volume: 0.6
+      playing: false

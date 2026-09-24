@@ -13,12 +13,13 @@
  *   2. Manifest pack list ↔ dist/packs directories match exactly (no orphans).
  *   3. Source ↔ compiled parity per pack: every YAML document appears in the
  *      compiled LevelDB (top-level counts), and child entries (journal pages,
- *      table results) match the source counts.
+ *      table results, scene levels, playlist sounds) match the source counts.
  *   4. LevelDB key formats match the Foundry v14 layout
  *      (!items!, !actors!, !journal!, !journal.pages!, !tables!,
- *       !tables.results!, !macros!, !scenes!, !scenes.levels!), every scene
- *      document carries the modern Level shape + schema stamp, and the legacy
- *      top-level background/globalLight/darkness keys are absent.
+ *       !tables.results!, !macros!, !scenes!, !scenes.levels!, !playlists!,
+ *       !playlists.sounds!), every scene document carries the modern Level shape
+ *      + schema stamp, and the legacy top-level background/globalLight/darkness
+ *      keys are absent. Playlist sound paths are checked against dist/.
  *   5. No unresolved authoring slug fields (`*Slugs`) leaked into the build,
  *      and every cross-reference UUID points back at this module.
  *
@@ -146,15 +147,38 @@ async function audit() {
       (n, d) => n + (d.type === 'scene' || d.type === 'Scene' ? 1 : 0),
       0,
     );
+    const expectedSounds = documents.reduce(
+      (n, d) => n + (d.type === 'playlist' || d.type === 'Playlist' ? (d.sounds?.length ?? 0) : 0),
+      0,
+    );
     const pageEntries = keys.filter((k) => k.startsWith('!journal.pages!')).length;
     const resultEntries = keys.filter((k) => k.startsWith('!tables.results!')).length;
     const levelEntries = keys.filter((k) => k.startsWith('!scenes.levels!')).length;
+    const soundEntries = keys.filter((k) => k.startsWith('!playlists.sounds!')).length;
     if (pageEntries !== expectedPages) errors.push(`${packName}: expected ${expectedPages} journal pages, found ${pageEntries}`);
     else if (expectedPages) notes.push(`${packName}: ${pageEntries} journal pages`);
     if (resultEntries !== expectedResults) errors.push(`${packName}: expected ${expectedResults} table results, found ${resultEntries}`);
     else if (expectedResults) notes.push(`${packName}: ${resultEntries} table results`);
     if (levelEntries !== expectedLevels) errors.push(`${packName}: expected ${expectedLevels} scene levels, found ${levelEntries}`);
     else if (expectedLevels) notes.push(`${packName}: ${levelEntries} scene levels`);
+    if (soundEntries !== expectedSounds) errors.push(`${packName}: expected ${expectedSounds} playlist sounds, found ${soundEntries}`);
+    else if (expectedSounds) notes.push(`${packName}: ${soundEntries} playlist sounds`);
+
+    // Playlist sounds must point at files that actually ship inside dist/ — a
+    // broken path is silent at the table (the GM simply gets no audio).
+    for (const [key, value] of entries) {
+      if (!key.startsWith('!playlists.sounds!')) continue;
+      const soundPath = value?.path ?? '';
+      const prefix = `modules/${manifest.id}/`;
+      if (!soundPath.startsWith(prefix)) {
+        errors.push(`${key}: sound path must live inside the module → ${soundPath || '(empty)'}`);
+        continue;
+      }
+      const rel = soundPath.slice(prefix.length);
+      if (!(await fs.pathExists(path.join(DIST, rel)))) {
+        errors.push(`${key}: sound file missing from dist → ${rel}`);
+      }
+    }
 
     // Scene documents must carry the modern v14 shape: background on an
     // embedded Level, no legacy top-level background/globalLight/darkness,
@@ -170,7 +194,7 @@ async function audit() {
 
     // ── 4. Key formats ────────────────────────────────────
     for (const key of keys) {
-      const ok = /^!(items|actors|journal|journal\.pages|tables|tables\.results|macros|scenes|scenes\.levels)!/u.test(key);
+      const ok = /^!(items|actors|journal|journal\.pages|tables|tables\.results|macros|scenes|scenes\.levels|playlists|playlists\.sounds)!/u.test(key);
       if (!ok) errors.push(`${packName}: unexpected key format "${key}"`);
     }
 

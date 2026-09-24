@@ -445,5 +445,45 @@ export function transformDocument(doc, { registry = null } = {}) {
     ];
   }
 
+  if (doc.type === 'playlist' || doc.type === 'Playlist') {
+    // Foundry V14 stores playlist sounds as separate LevelDB entries
+    // (`!playlists.sounds!<playlistId>.<soundId>`), referenced by id in the
+    // parent document — same pattern as journal pages and table results.
+    //
+    // Schema notes: `channel` is required but has an initial value (`music`), so
+    // omit it and let Foundry fill it; `seed` is a NON-nullable integer, so omit
+    // it too (sending null fails validation and the pack import throws).
+    const sounds = (doc.sounds ?? []).map((sound) => ({
+      _id: toFoundryId(`${doc._id}-${sound._id}`),
+      name: sound.name,
+      path: sound.path,
+      repeat: sound.repeat ?? false,
+      volume: sound.volume ?? 0.5,
+      playing: false,
+      flags: sound.flags || {},
+      sort: sound.sort ?? 0,
+    }));
+    const playlist = {
+      _id: id,
+      name: doc.name,
+      description: doc.description || '',
+      mode: doc.mode ?? 0,
+      playing: false,
+      fade: doc.fade ?? 2000,
+      sorting: doc.sorting || 'a',
+      sounds: sounds.map((s) => s._id),
+      flags: doc.flags || {},
+      folder: doc.folder || null,
+      sort: doc.sort || 0,
+      ownership: doc.ownership || { default: 0 },
+      _stats: doc._stats || {},
+    };
+    const entries = [{ key: `!playlists!${id}`, data: playlist }];
+    for (const sound of sounds) {
+      entries.push({ key: `!playlists.sounds!${id}.${sound._id}`, data: sound });
+    }
+    return entries;
+  }
+
   return null;
 }

@@ -22,6 +22,7 @@ for every document type a mission uses, the complete build/test/release tooling,
 | **Quality gates** | `npm run validate` (schema checks), `npm run audit` (manifest ↔ build parity, key formats, cross-link integrity) and `npm run scenes:verify` (scene Levels, art files, migration stamp) |
 | **Content installer** | A module settings menu that imports all packs into a world with per-pack folders, overwrite-by-id updates, automatic landing-scene activation, and scene-art repair on older imports |
 | **Scene art ready** | Landing splash page + theater-of-the-mind/battle-map scenes authored as YAML and compiled onto Foundry v14 **Level** documents, so artwork survives import |
+| **Sound effects ready** | A `Sound Effects` Playlist pack — ambience beds, props and stings compiled from YAML, checked against `dist/` by the audit, and licensed for redistribution |
 | **Spoiler lock** | All packs ship GM-only (`"ownership": { "PLAYER": "NONE" }`) so players cannot browse DA briefs or walkthroughs from their sidebar — world copies you reveal still reach them |
 | **System guard** | The module is inert outside the **neon-relic** system and warns the GM if wrongly enabled |
 | **Local testing** | `tools/push-local.sh` — build and deploy to a local Foundry install (rsync or symlink mode) |
@@ -63,6 +64,7 @@ Search for `neon-relic-mission-template` and update every occurrence:
 | --- | --- |
 | `static/module.json` | `id` (your module id, e.g. `my-mission`), `title`, `description`, `authors`, `version` (start at `0.1.0`), `url`/`bugs`/`changelog`, and the `manifest`/`download` URLs → **your** repo's `releases/latest/download/...` |
 | `static/scripts/main.mjs` | `MODULE_ID` at the top |
+| `src/packs/example-sfx.yaml` | Playlist packs: looping beds vs one-shot stings, and the licensing rule for audio |
 | `src/packs/example-scenes.yaml` | The `flags` namespace (`neon-relic-mission-template:` → your id) and the background `src` path |
 | Any pack YAML `img:` paths | `modules/<your-module-id>/assets/...` |
 | `package.json` | `name`, `description` |
@@ -95,7 +97,8 @@ system, enable the module in **Manage Modules**, and run **Configure Settings �
 
 Replace the example packs with your own content. The [Content Guide](CONTENT-GUIDE.md) documents
 every document type, its fields, and — critically — the **player-facing vs DA-only content rules**
-that this project holds authors to.
+that this project holds authors to. Sound effects (§3.14) follow one hard rule: only ship audio you
+may redistribute (public domain, CC0, CC-BY with credit, or your own ffmpeg-generated tracks).
 
 ### 6. Release
 
@@ -282,6 +285,7 @@ Then enable in a world and run the Content Installer.
 | Cards/journal show phantom empty pages | You hand-edited `dist/` or skipped `compactRange` — always rebuild with `npm run build`. |
 | Imported scene is an **empty black square** | The pack scene lost its v14 Level — usually a record without `_stats.coreVersion`, or a legacy top-level `background` making `migrateLevels` rebuild it. Rebuild with `npm run build` (the compiler stamps the gate), restart Foundry, re-run the Content Installer: it repairs existing world scenes and reports `N scenes repaired`. |
 | Scene art missing for players, GM sees it | They are looking at the canvas of a different scene: activating a scene pulls every client to it. Accessibility/`navigation` only add it to their own scene list. |
+| Playlist track is silent | The sound `path` doesn't resolve. `npm run audit` fails on this — if you edited `dist/` by hand instead of rebuilding, the file isn't there. |
 | Module warns "requires neon-relic" in another system world | Working as intended: the module is system-locked (manifest `relationships.systems` + runtime guard). |
 | Foundry lists the module but won't enable it | The world's neon-relic system version is below the `compatibility.minimum` in `static/module.json`. |
 

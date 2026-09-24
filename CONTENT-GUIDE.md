@@ -32,10 +32,12 @@ document types map onto that structure:
 | Journals | `journalEntry` | journals | Either | Handouts (player) and run sheets / walkthroughs (DA) |
 | Tables | `rollTable` | tables | DA | Complications, fractures, random flavour |
 | Scenes | `scene` | scenes | Both | Landing splash page, theater-of-the-mind views, gridless battle maps |
+| Sound effects | `playlist` | sfx | DA runs it, players hear it | Ambience beds, props and stings cued to beats of the walkthrough |
 
 Scale reference (Mission: Sangreal): 61 information cards (45 evidence + 16 cast), 16 NPCs,
 7 locations, 2 factions, 10 relic/equipment items, 4 journals including a day-by-day DA walkthrough,
-and 27 scenes (landing page + 16 theater-of-the-mind views + 10 gridless battle maps).
+and 27 scenes (landing page + 16 theater-of-the-mind views + 10 gridless battle maps) plus a
+25-track sound-effects playlist cued to the walkthrough.
 
 ---
 
@@ -334,6 +336,55 @@ Example: `example-scenes.yaml` (landing page + one atmosphere scene).
   scene's `active` / `navigation` / `ownership`, remaps the pack Level onto the world's Level id
   (no duplicates), and repairs scenes imported by older builds — reporting `N scenes repaired`.
 
+### 3.14 `playlist` — sound effects
+
+A playlist is how the module puts sound at the table: looping ambience beds, one-shot props and
+  stings. Author one playlist document; each `sounds` entry points at a file under `src/assets/**`
+  so it ships with the module.
+
+```yaml
+- _id: my-sfx
+  name: Example Sound Effects
+  type: playlist
+  description: 'Ambience beds and stings, cued to the walkthrough.'
+  mode: 0        # 0 sequential, 1 simultaneous, 2 shuffle
+  fade: 2000
+  sorting: 'a'
+  sounds:
+    - _id: my-sfx-bed
+      name: 'Ambience — Vault bed (loop)'
+      path: modules/<your-module-id>/assets/audio/vault-bed.mp3
+      repeat: true
+      volume: 0.4
+    - _id: my-sfx-sting
+      name: 'Sting — Thread snap'
+      path: modules/<your-module-id>/assets/audio/thread-snap.mp3
+      repeat: false
+      volume: 0.6
+```
+
+Rules that matter:
+
+- **Beds loop, stings don’t.** Ambience 30–45 s with `repeat: true`; props/stings 1–8 s with
+  `repeat: false`. `volume` is a 0–1 starting trim (Foundry default 0.5): ambience 0.35–0.45,
+  one-shots 0.5–0.65. Ride them live at the table.
+- **The build owns the shape.** Each sound compiles to its own
+  `!playlists.sounds!<playlistId>.<soundId>` entry, exactly like journal pages and scene Levels.
+  Never author `seed` (non-nullable integer) or `channel` (required, but Foundry fills `music`).
+- **`npm run audit` fails if a sound file is missing from `dist/`** — silent audio is otherwise
+  invisible until the GM hits play.
+- **Licensing — only ship audio you may redistribute.** Safe: public domain, CC0, CC-BY (credit the
+  author), or audio you synthesize yourself (ffmpeg). Avoid stock libraries whose licence forbids
+  standalone redistribution (Mixkit, Pixabay, most “free SFX” sites) — a module zip is exactly
+  that. Keep a `CREDITS.md` next to the audio (it ships) listing source URL, licence and author for
+  every third-party file.
+- **Cue it in the walkthrough.** Reference each track at the beat that calls for it — either inline
+  (`(play <em>Vault bed</em>)`) or as a cue-sheet page at the end of the DA walkthrough mapping
+  beat → track. Append pages only: journal page ids are position-based, so inserting a page
+  renumbers the ones after it and breaks stored UUID links.
+
+Example: `example-sfx.yaml` (one bed + one sting; both sounds are ffmpeg-synthesized originals).
+
 ---
 
 ## 4. Content policy — player-facing vs DA-only
@@ -428,6 +479,7 @@ Run the automated gates, then walk the human checklist:
 - [ ] `npm run validate` — schema + cross-reference checks pass
 - [ ] `npm run audit` — manifest ↔ build parity, links intact
 - [ ] `npm run scenes:verify` — every scene has a v14 Level, a background file, and the migration stamp
+- [ ] Sound: every playlist track plays (audit proves the files ship) and the beds loop cleanly
 - [ ] Every pack locked to the GM (`"PLAYER": "NONE"`) or unlocked on purpose (§4.5)
 - [ ] Every player-visible surface read once **as a player**: can anything be spoiled by it?
 - [ ] Cast cards checked against §4.2 (no photograph descriptions)
