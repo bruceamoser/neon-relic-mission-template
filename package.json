@@ -1,6 +1,6 @@
 {
   "name": "neon-relic-mission-template",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "Mission template for Neon Relic — Foundry VTT v14 content module scaffolding with examples of every document type",
   "license": "MIT",
