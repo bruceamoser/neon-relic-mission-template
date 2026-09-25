@@ -433,7 +433,6 @@ distilled from building Mission: Sangreal; the template's scripts assume them.
 - Case-board milestone descriptions and track internals
 
 ### 4.2 The cast card rule (repeated because it is the most common mistake)
-
 A cast card is **the Covenant's file folder on the person** — not a description of the artwork.
 Players can (and should) open the image themselves with Examine Photo; describing the photograph
 in prose wastes the card and spoils the hunt for details.
@@ -458,6 +457,16 @@ The anti-pattern shows composition and props. The good version states the same c
 5. **No dev-meta.** No stat references, sheet jargon, or designer commentary in player text.
 6. **Documents quote themselves.** For memos, ledgers, letters: quote the text verbatim — that IS
    the artefact. For visual evidence: describe at a glance.
+7. **Titles are player-visible too.** A card's `name` shows up in the Information Web graph, the
+   sidebar and every link label *before* anyone opens it, so the title must name the **object**, never
+   the answer. `I19 — Plinth Detail, Brass Plate` is right; `I19 — The Name Below the Plinth` hands
+  the players the payoff; `I4 — Numerals on Rag Paper` is right where `I4 — The Polybius Vulgate
+   Cipher` names the method they are supposed to work out. Watch for the same disease in cast cards
+   (`N11 — Unidentified Male, Unaged`, not `N11 — The Basarab Elder`), in `daNotes`-style conclusions
+   smuggled into headings, and in `img` filenames that ship with the pack.
+   - Rename freely: pack ids come from `_id` slugs, so titles can change without breaking a single
+     cross-link. Sweep the label text in journals, the egg-index tables and the art manifest when
+     you do.
 
 ### 4.4 DA notes: keep everything the players must not see
 
