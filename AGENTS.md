@@ -99,3 +99,10 @@ descriptions** — and keep spoilers in `daNotes` / DA documents.
   mid-journal renumbers the rest and breaks stored page UUID links (e.g. scene `journalEntryPage`).
 - The module is system-locked to `neon-relic` (manifest `relationships.systems` + runtime guard in
   `main.mjs`); do not remove either.
+- **The installer must never overwrite world-side `ownership`**: pack ownership secures the
+  compendium; *world document* ownership is what a GM sets so players can see a handout, card or
+  scene. The installer strips `ownership` (and, for scenes, the reveal state) out of the update
+  payload — `existing.update(...)` would otherwise reset those grants on every re-import, which is
+  the single most annoying thing a content installer can do to a running campaign. If you extend the
+  installer, preserve world-side playtest state deliberately instead of writing pack values back
+  over it.

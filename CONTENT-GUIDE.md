@@ -499,6 +499,34 @@ by world document ownership, not by pack ownership. Caveat: this controls UI exp
 determined player with console access can still read pack documents, because core v14 does not
 gate `pack.getDocument()` on ownership.
 
+### 4.6 Portraits vs photographs — never put the clue on the introduction
+
+Two different images do two different jobs, and the same file cannot do both.
+
+| | Portrait | Photograph |
+| --- | --- | --- |
+| **Job** | let a player recognise a person | hand the players evidence to study |
+| **Goes on** | the NPC actor's `img` **and** the person's cast card (`N…`) | its own information card (`P…`) |
+| **Content** | face, wardrobe, attitude — nothing to decode | the frame, with its tells, props and pairings intact |
+| **Player reads it** | once, to know who they are talking to | repeatedly, looking for what is wrong |
+
+The failure mode to avoid: a striking portrait whose value comes from a detail — a
+stained cuff, a missing finger, two men with the same ring, a wristwatch set to the
+wrong time. If that detail lives on the portrait shown at introduction, either the
+players get the payoff for free or the art is wasted. Split it:
+
+1. The **clean portrait** becomes the actor image and the cast card image.
+2. The **clue-laden frame** becomes its own information card — the photograph as an
+   object, registered in the information web with its own slug and cross-links.
+3. On that card, keep the retrieval line **from the cast card's DA notes** so the frame
+   still surfaces at the beat the clue was designed for, and give it the full four-part
+   `daNotes` format.
+
+This is what happened in Sangreal: sixteen dossiers were re-imaged with clean portraits,
+and the sixteen superseded frames became cards `P1–P16` with retrieval adapted from the
+matching cast card. A walkthrough "cue sheet" page listing every frame and the beat it
+arrives on is the cheapest way to keep the set findable.
+
 ---
 
 ## 5. Pre-release QA checklist

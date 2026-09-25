@@ -2,7 +2,7 @@
   "id": "neon-relic-mission-template",
   "title": "Mission Template (Example Content)",
   "description": "<p>A working template for building <strong>Neon Relic</strong> mission modules for Foundry VTT v14 — with example content for every document type (case briefs, case board, information cards, locations, factions, NPCs, relics, journals, tables, scenes, and a sound-effects playlist).</p><p>Use this as the starting point for your own case file: rename the module id, replace the example packs with your mission, set your own manifest URLs, then build, test, and release using the included tooling. See the repository README and CONTENT-GUIDE.md for the full authoring reference.</p><p>Requires the <strong>neon-relic</strong> game system — this module is not compatible with any other system.</p>",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "esmodules": [
     "scripts/main.mjs"
   ],
