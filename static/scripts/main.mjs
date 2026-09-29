@@ -88,6 +88,23 @@ function buildInstallPlan() {
 }
 
 /**
+ * Read the version of the module files on disk. This can be newer than the
+ * module data the server loaded at launch — the usual reason a pack added by an
+ * update stays invisible (a case that used to fail silently).
+ * @returns {Promise<string|null>}
+ */
+async function moduleFileVersion() {
+  try {
+    const response = await fetch(`modules/${MODULE_ID}/module.json`);
+    if (!response.ok) return null;
+    const manifest = await response.json();
+    return manifest.version ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Reconcile an incoming pack Scene with the world copy it is about to
  * overwrite.
  *
@@ -161,6 +178,8 @@ async function installContent() {
   let failed = 0;
   const sceneStats = { repaired: 0 };
 
+  const loadedVersion = game.modules.get(MODULE_ID)?.version ?? 'unknown';
+  const fileVersion = await moduleFileVersion();
   if (missing.length) {
     ui.notifications.warn(
       `${rootFolderName()} — this build added ${missing.length} new pack(s) that Foundry has not loaded yet: ${missing.join(', ')}. ` +
@@ -168,6 +187,16 @@ async function installContent() {
       { permanent: true },
     );
     console.warn(`${MODULE_ID} | installer: packs declared but not registered`, missing);
+  } else if (fileVersion && fileVersion !== loadedVersion) {
+    ui.notifications.warn(
+      `${rootFolderName()} — the installed files are version ${fileVersion} but this server loaded ${loadedVersion}. ` +
+        'Restart the server to pick up the new packs, then run the installer again.',
+      { permanent: true },
+    );
+    console.warn(`${MODULE_ID} | installer: module files newer than loaded data`, {
+      fileVersion,
+      loadedVersion,
+    });
   }
 
   for (const { pack: packName, type, label, folder: subfolderName } of plan) {
@@ -238,7 +267,9 @@ async function installContent() {
     sceneStats.repaired ? `, ${sceneStats.repaired} scenes repaired` : ''
   }${failed ? `, ${failed} failed` : ''}${
     missing.length ? `, ${missing.length} pack(s) awaiting a Foundry restart` : ''
-  }).`;
+  }${
+    !missing.length && fileVersion && fileVersion !== loadedVersion ? `, restart needed (files ${fileVersion})` : ''
+  }) — module build ${loadedVersion}, ${plan.length} pack(s) imported.`;
   console.log(`${MODULE_ID} | installer: ${summary}`);
   if (failed) {
     ui.notifications.error(`${failed} document(s) failed to install — see the console for details.`);
