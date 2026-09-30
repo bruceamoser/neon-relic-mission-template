@@ -569,3 +569,74 @@ Run the automated gates, then walk the human checklist:
 - [ ] The landing scene activates in a fresh world (test with the Content Installer)
 - [ ] Version bumped in `package.json` **and** `static/module.json`
 - [ ] `manifest`/`download` URLs still point at `releases/latest/download/`
+
+---
+
+## 6. GM-facing craft — how a run sheet should read
+
+The module is read at the table, in the dark, by someone who is also running six NPCs. These
+conventions are taken from how the strongest published scenarios present themselves (Delta Green's
+*Last Things Last*, Kobold Press's *Adventures of Dib*) and are what Mission: Sangreal's walkthrough
+follows. Apply them to every DA-facing run sheet, walkthrough page and location dossier.
+
+### 6.1 State the truth before the first scene
+
+A DA run sheet opens with the **background page**: the whole situation stated plainly, in the order
+it actually happened, with no coy setup. Who did what, why, what the relic really is, where the
+horror actually lies — in the DA's language, up front. Then the players' job is discovery, not
+decoding the module. Include:
+
+- **The truth, in plain words** — the real sequence of events, stated once, completely.
+- **The horror, stated plainly** — the DA cannot run dread they have to infer. Say what the thing is.
+- **Who wants what** — a table of every player in the case (factions *and* individuals): what each
+  one wants and what each will actually do to get it. The walkthrough's branching depends on it.
+- **What the players must work out** — the three or four facts the case is built around, in the
+  order the evidence supports them.
+- **The fixed dates** — the events that cannot move, so the DA can improvise around them.
+- **Running habits** — the explicit table contract: say the plain thing, describe then stop, play
+  NPCs as people with jobs, reward cleverness before complicating it, and invent freely where the
+  material is silent.
+
+### 6.2 Every act carries its own hidden truth
+
+Each act/beat sequence opens with a short **"The truth of this act"** paragraph: what is really
+happening off camera in these days, who is doing it and why, and what the players will never be
+told. This is what lets a DA answer an unplanned question without breaking the case. It is *not*
+player knowledge, and it should not repeat the off-camera timeline — it explains it.
+
+Give each act exactly **one read-aloud passage**, marked as such, written to be spoken verbatim:
+two or three sentences of sensor data that set the register. Everything else on the page is the DA's
+to paraphrase, and saying so out loud at the top saves a lot of misreading.
+
+### 6.3 NPC blocks: look, want, refuse, know
+
+Every NPC who matters gets four things, in this order, in prose — not a stat sheet:
+
+1. **What they look like** — one line of concrete physical detail the players can picture.
+2. **What they want** — their actual goal in this scene.
+3. **What they will never do** — the hard limit that makes them a person rather than a vending
+   machine, and what happens if the cell pushes against it.
+4. **What they know** — the facts they volunteer, the facts they will trade, the one lie they tell,
+   and the tell that gives the lie away. Most NPCs in a case are *not* hiding a plot: they are
+   professionals with a job, and the mundane register is what makes the supernatural land.
+
+### 6.4 Gates buy detail, not existence
+
+A test should never be the only door to a clue the case requires. Write each gate so the card is
+reachable without the roll and the roll buys **interpretation**:
+
+- **Gate:** the condition for getting the card (a scene, a shift of work, an NPC's cooperation).
+- **Failure cost:** always time, position or goodwill — never the clue, unless the beat says so.
+- **Layered success:** where a reading can yield more, say what each further success adds.
+
+State it in the how-to-run page: failure costs time, and the packet always delivers. A case players
+can *fail to solve* is a case that stops.
+
+### 6.5 Keep flavour and instruction in separate rooms
+
+Read-aloud text, in-world quotes and boxed sensory description are clearly marked and never mixed
+into the mechanics. Instructions are dry, plain and complete: "she can be appeased by any convincing
+story; it takes a social test only if the players make her suspicious." Wherever the material is
+genuinely open, say **"You decide"** and mean it — then treat the invented version as canon
+afterwards. The DA should finish reading a page knowing exactly what to say, what to roll if
+anything, and what happens either way.
