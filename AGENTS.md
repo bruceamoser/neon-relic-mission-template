@@ -81,6 +81,14 @@ descriptions** — and keep spoilers in `daNotes` / DA documents.
   start, so a pack added to `static/module.json` by an update is absent from `game.packs` until the
   app is restarted. The installer detects this and warns (`N pack(s) awaiting a Foundry restart`)
   instead of skipping the pack silently — do not remove that check.
+- **Card ids are zero-padded and family-prefixed** (`I01`, `N07`, `C24`): Foundry sorts
+  folders by name as plain text, so unpadded ids read as `I1, I10, I11, I2`. One prefix per
+  family, padded to at least two digits, and keep it stable once published — the ids are
+  player-visible and other documents quote them.
+- **One pack may feed several world folders**: `PACK_FOLDER_ROUTES` in `static/scripts/main.mjs`
+  routes documents by card-id prefix (e.g. `N…` → Cast Cards, `F…` → Photographic Evidence),
+  so a single compendium pack can present as several tidy folders. Unrouted documents land in
+  the pack's plan folder. See CONTENT-GUIDE §3.5.
 - **Playlists compile to two entry kinds**: `!playlists!<id>` plus one
   `!playlists.sounds!<id>.<soundId>` per sound (v14 stores sounds separately, like journal pages).
   Never author `seed` (non-nullable integer — `seed: null` fails validation) or `channel` (required,

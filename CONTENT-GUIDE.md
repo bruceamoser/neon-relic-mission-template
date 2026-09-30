@@ -151,10 +151,32 @@ Example: `example-briefs.yaml → example-information-web`.
 
 ### 3.5 `informationCard` — evidence and cast dossiers
 
-The clue economy. Fields: `cardId` (`I-1`, `CT-1`, `N-1` …), `cardType`
+The clue economy. Fields: `cardId` (`I-01`, `CT-1`, `N-01` …), `cardType`
 (`supportingIntel` | `containmentTruth`), `content` (player-facing), `foundAtSlugs`,
 `knownBySlugs`, `npcSlugs`, `hqFallback` (day number for HQ fallback delivery, 0 = none),
 `daNotes`.
+
+**Zero-pad the numbers in a card family** (`I-01`…`I-45`, `N-01`…`N-16`). Foundry sorts a
+folder by name as plain text, so `I-1, I-10, I-11, I-2` is what a table sees without padding —
+and the same goes for the number in the card `name` (`I01 — …`). Use one prefix per family so
+the sidebar groups them, and keep the prefix stable once the pack is published: the ids are
+player-visible and other documents quote them.
+
+**Several families in one pack** are fine — the pack is a compendium, not a table of contents.
+The Content Installer files them into separate world folders with `PACK_FOLDER_ROUTES`
+(`static/scripts/main.mjs`), matching on the card-id prefix:
+
+```js
+const PACK_FOLDER_ROUTES = {
+  'example-clues': [
+    { match: /^N\d/, folder: 'Cast Cards' },
+    { match: /^F\d/, folder: 'Photographic Evidence' },
+  ],
+};
+```
+
+Anything that matches no route lands in the pack's own folder from the import plan, so a
+single-family pack needs no configuration at all.
 
 **`content` rules depend on what the card shows:**
 

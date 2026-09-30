@@ -149,6 +149,26 @@ function prepareSceneUpdate(existing, data, stats) {
 }
 
 /**
+ * Per-pack folder routing by card-id prefix.
+ *
+ * A single compendium pack may hold several kinds of document that belong in
+ * different world folders (Neon Relic mission packs commonly mix clues, cast
+ * cards and photographic evidence, which differ by card-id prefix). Map a pack
+ * name to an ordered list of routes; the first matching prefix wins and anything
+ * unmatched falls back to the pack's folder from the plan.
+ *
+ * Example:
+ *   const PACK_FOLDER_ROUTES = {
+ *     'example-clues': [
+ *       { match: /^N\d/, folder: 'Cast Cards' },
+ *       { match: /^F\d/, folder: 'Photographic Evidence' },
+ *     ],
+ *   };
+ * @type {Record<string, Array<{match: RegExp, folder: string}>>}
+ */
+const PACK_FOLDER_ROUTES = {};
+
+/**
  * Import or refresh every module pack into the world.
  *
  * World documents whose IDs match a pack document are UPDATED in place, so
@@ -206,11 +226,22 @@ async function installContent() {
       continue;
     }
 
-    // Resolve the destination folder structure for this pack's collection
-    let folderId = null;
+    // Resolve the destination folder for this pack — and, when a pack carries
+    // several document families, per document (see PACK_FOLDER_ROUTES).
+    let rootId = null;
+    const folderCache = new Map();
+    const routes = PACK_FOLDER_ROUTES[packName] ?? [];
+    const folderFor = async (doc) => {
+      const routed = routes.find((r) => r.match.test(doc.system?.cardId ?? ''))?.folder;
+      const name = routed ?? subfolderName;
+      const key = name ?? '';
+      if (!folderCache.has(key)) {
+        folderCache.set(key, name ? await ensureFolder(name, type, rootId) : rootId);
+      }
+      return folderCache.get(key);
+    };
     try {
-      const rootId = await ensureFolder(rootFolderName(), type);
-      folderId = subfolderName ? await ensureFolder(label, type, rootId) : rootId;
+      rootId = await ensureFolder(rootFolderName(), type);
     } catch (err) {
       console.warn(`${MODULE_ID} | installer: folder setup failed for ${packName}`, err);
     }
@@ -226,7 +257,12 @@ async function installContent() {
 
     for (const doc of docs) {
       const data = doc.toObject();
-      if (folderId) data.folder = folderId;
+      try {
+        const folderId = rootId === null ? null : await folderFor(doc);
+        if (folderId) data.folder = folderId;
+      } catch (err) {
+        console.warn(`${MODULE_ID} | installer: could not file ${doc.name}`, err);
+      }
       const collection = game.collections.get(doc.documentName);
       const existing = collection?.get(doc.id);
       try {
