@@ -640,3 +640,13 @@ story; it takes a social test only if the players make her suspicious." Wherever
 genuinely open, say **"You decide"** and mean it — then treat the invented version as canon
 afterwards. The DA should finish reading a page knowing exactly what to say, what to roll if
 anything, and what happens either way.
+
+### 6.6 Plant one misreading, and never correct it
+
+The strongest cases give the players a wrong answer they can believe for most of the run — Delta Green's "she's just a woman in a tank", Dib's "it's a fortress on wheels". A planted misreading is not a puzzle the DA protects; it is an expectation the DA *feeds*.
+
+- **Name it on the DA background page**, with the evidence that supports it and the reason the NPCs behave as if it were true (a silence, a refusal, a treaty clause). The DA must know it is a plant, or they will accidentally disconfirm it in play.
+- **Never deny it.** Have no NPC correct the players, and instruct the DA explicitly: a denial is as good as a confirmation, and winking at the table destroys the effect. If a player announces the wrong answer, write it on the board in their words.
+- **Let the clues fit.** A good misreading has to *feel* like a solution. The material should supply it with supporting detail, and the first act's reveals should confirm it.
+- **Give it one good re-parse later.** The reveal should take a sentence — a word with two readings, a photograph read at the wrong scale, a body already labelled. Spend it once, at the right beat, and then let the players work backwards through what they have already been told.
+- **Keep it off player surfaces.** The plant lives in the DA material only. A player handout may *contain* the ambiguous word; it must never explain it. (Check this on the next content pass — a well-meaning clarification on a handout is the commonest way a plant dies.)
