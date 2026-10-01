@@ -1,3 +1,5 @@
+import { preserveProgress } from './preserve-progress.mjs';
+
 /**
  * Mission template — module entry point.
  *
@@ -269,7 +271,7 @@ async function installContent() {
         if (existing) {
           // Overwrite in place, keeping the pack ID and any world-side
           // additions the update does not touch (diff: false = no deletions).
-          const update = doc.documentName === 'Scene' ? prepareSceneUpdate(existing, data, sceneStats) : { ...data };
+          const update = doc.documentName === 'Scene' ? prepareSceneUpdate(existing, data, sceneStats) : preserveProgress(existing.toObject(), data);
           // Permissions belong to the world, not the pack: a GM who has granted
           // players access to a document must not lose it on every re-import.
           delete update.ownership;

@@ -572,6 +572,20 @@ Run the automated gates, then walk the human checklist:
 
 ---
 
+### 4.7 The installer must not reset live progress
+
+Companion to §4.5. Pack ownership secures the compendium; **world-side state belongs to the
+table**. A content installer that writes pack values over a world document wipes a running
+campaign's progress on every re-import — board day and filled shifts, revealed cards, faction
+track values, consumed squares, triggered milestones, custom tracks and permissions.
+
+`static/scripts/preserve-progress.mjs` implements this and is wired into the installer's
+in-place update path: authored text is refreshed, live progress is carried across, and
+milestones are merged by key so an event's wording can be revised without resetting whether it
+already fired. `npm run test:progress` covers it. Extend the module for any new stateful
+document type rather than adding ad-hoc patches — and never promise a merge of hand-edited
+prose; a short note in the release is the honest approach.
+
 ## 6. GM-facing craft — how a run sheet should read
 
 The module is read at the table, in the dark, by someone who is also running six NPCs. These
